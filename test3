@@ -1,3 +1,19 @@
+
+
+function con_log(txt, header)
+	if not header then
+		header = "information:"
+	end
+  game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = tostring(header);
+    Text = tostring(txt);
+    Duration = 5
+  })
+end
+con_log('check1')
+
+
+
 local Config = {
     WindowName = "V.G Hub",
     Color = Color3.fromRGB(255, 128, 64),
@@ -803,6 +819,7 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 	RunService.RenderStepped:connect(
 		function()
 			if Settings.PetFarm then
+				con_log("fuk")
 				pcall(function()
 					Player.Character.Humanoid:ChangeState(11)
 					Workspace["P"].CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-5,0))
@@ -829,7 +846,7 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 			ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
 			Pet = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
 		end
-
+--[[
 		local a
 		a = {
 			["sleepy"] = function(c)
@@ -1042,7 +1059,7 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 					end)
 				end
 			end
-		)
+		)]]
 	end)
 end)
 local Dropdown = Section1:CreateDropdown("Pets", List, function(Name)
