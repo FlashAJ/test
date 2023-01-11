@@ -829,9 +829,9 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 	)
 
 	spawn(function()
-	if not Settings.PetFarm then
-		Player.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState("Jumping")
-	end 
+		if not Settings.PetFarm then
+			Player.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState("Jumping")
+		end 
 
 
 
@@ -846,7 +846,7 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 			ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
 			Pet = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
 		end
---[[
+
 		local a
 		a = {
 			["sleepy"] = function(c)
@@ -1059,7 +1059,8 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 					end)
 				end
 			end
-		)]]
+		)
+		--]]--
 	end)
 end)
 local Dropdown = Section1:CreateDropdown("Pets", List, function(Name)
