@@ -1,3 +1,18 @@
+
+
+function con_log(txt, header)
+	if not header then
+		header = "information:"
+	end
+  game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = tostring(header);
+    Text = tostring(txt);
+    Duration = 5
+  })
+end
+con_log('Hi!')
+
+
 local Config = {
     WindowName = "V.G Hub",
     Color = Color3.fromRGB(255, 128, 64),
