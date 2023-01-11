@@ -819,7 +819,6 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 	RunService.RenderStepped:connect(
 		function()
 			if Settings.PetFarm then
-				con_log("", "FUCK this!")
 				pcall(function()
 					Player.Character.Humanoid:ChangeState(11)
 					Workspace["P"].CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-5,0))
@@ -827,12 +826,11 @@ local Toggle2 = Section1:CreateToggle("PetFarm", Settings.PetFarm, function(Stat
 			end
 		end
 	)
-	
 
 	spawn(function()
-		if not Settings.PetFarm then
-			Player.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState("Jumping")
-		end 
+	if not Settings.PetFarm then
+		Player.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState("Jumping")
+	end 
 
 
 
@@ -1924,5 +1922,3 @@ local Slider4 = Section4:CreateSlider("Tile Scale",0,1,nil,false, function(Value
 	Window:SetTileScale(Value)
 end)
 Slider4:SetValue(0.5)
-
-con_log('done')
