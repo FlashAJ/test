@@ -843,7 +843,7 @@ end
 local a
 a = {
     ["sleepy"] = function(c)
-        while c.Parent == Player.PlayerGui.AilmentsMonitorApp.Ailments do
+        while Settings.PetFarm do
             wait()
             spawn(
                 function()
@@ -1028,11 +1028,15 @@ a = {
 
 
 
+
+
 spawn(
     function()
         while wait() and Settings.PetFarm do
             pcall(function()
-                local Ailment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChildWhichIsA("Frame")
+				a["sleepy"]("sleepy")
+                --[[
+				local Ailment = Player.PlayerGui.AilmentsMonitorApp.Ailments:FindFirstChildWhichIsA("Frame")
                 if Ailment then
                     local Name = Ailment.Name
                     if a[Name] and wait() then
@@ -1048,6 +1052,7 @@ spawn(
                     ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
                     Pet = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
                 end
+				]]
                 wait(1)
             end)
         end
