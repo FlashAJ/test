@@ -830,14 +830,17 @@ end
 
 if Settings.Key then
     PetID = Settings.Key.unique
+	con_log(type(PetID), PetID)
     AilmentFurnitues["generic_crib"] = nil
     while not AilmentFurnitues["generic_crib"] do
         wait()
         AilmentFurnitues["generic_crib"] = Bed()
         AilmentFurnitues["generic_shower"] = Showers()
     end
+	con_log(type(AilmentFurnitues["generic_crib"]), AilmentFurnitues["generic_crib"])
     ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
     Pet = ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+	con_log(type(Pet), Pet)
 end
 
 local a
