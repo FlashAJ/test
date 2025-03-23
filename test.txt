@@ -1114,7 +1114,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.2",
+    SubTitle = "ver. 2.5.3",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1495,7 +1495,7 @@ do
 															n = n + 1
 															flag = true
 															if n == 1 and b_n == 1 then
-																--m_timer = os.time() + 5
+																m_timer = os.time() + 5
 															end
 															table.insert(first_bankers, banker)
 														end
@@ -2056,7 +2056,9 @@ function()
 							end
 							if done2 ~= nil then
 								work[v]()
-								break
+								if v ~= "pet_me" then
+									break
+								end
 							elseif v == "walk" and not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v].components.preference then
 								work[v]()
 								break
