@@ -50,6 +50,10 @@ local Beds = {
     "RoyalCrib",
     "PoshCrib",
 }
+local lures_bait = {
+	"lures_2023_campfire_cookies",
+	"ice_dimension_2025_ice_soup_bait",
+}
 local exclude_food = {
 	"lures_2023_sparkling_blaze_berry",
 	"lures_2023_magma_mango",
@@ -59,6 +63,7 @@ local exclude_food = {
 	"lures_2023_overcooked_tart",
 	"lures_2023_campfire_cookies_liveops",
 	"lures_2023_campfire_cookies",
+	--beach_2024_mahi_spinning_rod_temporary|ice_dimension_2025_ice_soup_bait
 }
 local food = {
 	"apple",
@@ -515,8 +520,8 @@ function set_lure()
 			ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[Player.Name], lur, "UseBlock", {["reward"]=""}, Player.Character)
 			wait()
 			for i,v in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food) do
-				if v.id == "lures_2023_campfire_cookies" then
-					ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[Player.Name], lur, "UseBlock", {["bait_unique"]=i, ["bait_kind"]="lures_2023_campfire_cookies"}, Player.Character)
+				if v.id == lures_bait[2] then
+					ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[Player.Name], lur, "UseBlock", {["bait_unique"]=i, ["bait_kind"]=lures_bait[2]}, Player.Character)
 					lur_time = os.time()
 					break
 				end
@@ -870,10 +875,17 @@ work = {
 		set_thread_identity(2)
 		for i,v1 in Player.PlayerGui:GetChildren() do
 			if v1.Name == "ailments_list" then
-				pcall(function()
+				local _,err=pcall(function()
 					--getconnections(v1.SurfaceGui.Container.Ailment.MouseButton1Click)[1]:Fire()
 					getconnections(v1.SurfaceGui.Container.Ailment.MouseButton1Click)[1].Function()
 				end)
+				if err then
+					set_thread_identity(7)
+					keypress(0x45)
+					wait(.1)
+					keyrelease(0x45)
+					set_thread_identity(2)
+				end
 			end
 		end
 		wait(1)
@@ -1114,7 +1126,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.3",
+    SubTitle = "ver. 2.5.4",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
