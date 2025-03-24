@@ -890,7 +890,8 @@ work = {
 		end
 		wait(1)
 		ReplicatedStorage.API["AilmentsAPI/ProgressPetMeAilment"]:FireServer(PetID)
-		pcall(function()
+		wait(1)
+		local _,err=pcall(function()
 			--getconnections(Player.PlayerGui.FocusPetApp:FindFirstChild("BackButton",true).MouseButton1Down)[1]:Fire()
 			--getconnections(Player.PlayerGui.FocusPetApp:FindFirstChild("BackButton",true).MouseButton1Up)[1]:Fire()
 			--getconnections(Player.PlayerGui.FocusPetApp:FindFirstChild("BackButton",true).MouseButton1Click)[1]:Fire()
@@ -899,6 +900,11 @@ work = {
 			getconnections(Player.PlayerGui.FocusPetApp:FindFirstChild("BackButton",true).MouseButton1Click)[1].Function()
 		end)
 		set_thread_identity(7)
+		if err then
+			keypress(0x45)
+			wait(.1)
+			keyrelease(0x45)
+		end
 	end,
 }
 
@@ -1126,7 +1132,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.4",
+    SubTitle = "ver. 2.5.5",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
