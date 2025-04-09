@@ -703,7 +703,8 @@ work = {
 				ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Player, f_bowl, "UseBlock",
 						{["cframe"] = Player.Character.HumanoidRootPart.CFrame}, GetCurrentPetOut().base.pet_model.Parent)
 			elseif type(pref) == "string" then
-				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food[pref].id == "pet_treat" then
+				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food[pref].id == "pet_treat" or
+				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food[pref].id == "camping_2023_smores" then
 					Player.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState("Jumping")
 					wait(.05)
 				end
