@@ -854,7 +854,7 @@ work = {
 			end
 		end
 		ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(veh)
-		ReplicatedStorage.API["AdoptAPI/UseStroller"]:InvokeServer(GetCurrentPetOut().base.pet_model.Parent, Player.Character.StrollerTool.ModelHandle.TouchToSits.TouchToSit)
+		ReplicatedStorage.API["AdoptAPI/UseStroller"]:InvokeServer(Player, GetCurrentPetOut().base.pet_model.Parent, Player.Character.StrollerTool.ModelHandle.TouchToSits.TouchToSit)
 		local last_pos = Player.Character.HumanoidRootPart.CFrame
 		for i=1,16 do
 			Player.Character:FindFirstChildWhichIsA("Humanoid"):MoveTo(Player.Character.HumanoidRootPart.Position + Vector3.new(20*(-1)^i, 0, 20*(-1)^i))
@@ -1133,7 +1133,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.5",
+    SubTitle = "ver. 2.5.6",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
