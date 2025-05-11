@@ -1133,7 +1133,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.6",
+    SubTitle = "ver. 2.5.7",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1461,22 +1461,22 @@ do
 													if res == "busy" then
 													elseif res == "" or res == "error" then
 														table.remove(m_bankers, table.find(m_bankers, banker))
-														if bank_mode[banker] == "1" then
+														--if bank_mode[banker] == "1" then
 															kassa[banker] = nil
-														else
+														--else
 															maniq[banker] = nil
-														end
+														--end
 														bank_mode[banker] = nil
 														break
 													elseif string.find(res, banker) then
 														local amount = string.split(res, ":")[2]
 														if amount == "done" then
 															table.remove(m_bankers, table.find(m_bankers, banker))
-															if bank_mode[banker] == "1" then
+															--if bank_mode[banker] == "1" then
 																kassa[banker] = nil
-															else
+															--else
 																maniq[banker] = nil
-															end
+															--end
 															bank_mode[banker] = nil
 															break
 														else
@@ -1494,19 +1494,21 @@ do
 																pcall(function()
 																	ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
 																end)
-																pcall(function()
+																local _,err_ch=pcall(function()
 																	buy = ReplicatedStorage.API["AvatarAPI/BuyMannequinOutfit"]:InvokeServer(Players[banker], maniq[banker][1], maniq[banker][2], tonumber(amount))
+																	--con_log(buy)
 																	wait()
-																	--if buy then
-																		ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
-																	--end
-																end)
+																	ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
+																end)if err_ch then con_log(err_ch, 1495)end
 															end
 															bal = bal - require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
 															con_log(tostring(bal).." ("..tostring(os.time()-tmp_time).."sec.)", tostring(banker).." send:")
 															local check = true
 															if bal < 7 or not buy then --os.time()-tmp_time < 1 and 
 																check = false
+																if not buy then
+																	maniq[banker] = nil
+																end
 															end
 															local _,err=pcall(function()
 																res = game:HttpGet("http://"..manager.."/done="..banker.."&"..amount.."&"..Player.Name.."&"..tostring(check).."&"..tostring(os.time()-tmp_time))
@@ -1557,9 +1559,9 @@ do
 									end)if err then con_log(err) end
 									
 									if flag then
-										--if #m_bankers < 3 then
+										if #m_bankers < 3 then
 											m_timer = os.time()
-										--end
+										end
 									end
 									if not chk then
 										break
