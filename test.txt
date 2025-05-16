@@ -1132,7 +1132,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.7",
+    SubTitle = "ver. 2.5.8",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1374,11 +1374,15 @@ do
 									if not table.find(m_bankers, i:split("=")[1]) then
 										table.insert(m_bankers, i:split("=")[1])
 										bank_mode[i:split("=")[1]] = i:split("=")[2]
+									else
+										bank_mode[i:split("=")[1]] = i:split("=")[2]
 									end
 								end
 							elseif res ~= "" then
 								if not table.find(m_bankers, res:split("=")[1]) then
 									table.insert(m_bankers, res:split("=")[1])
+									bank_mode[res:split("=")[1]] = res:split("=")[2]
+								else
 									bank_mode[res:split("=")[1]] = res:split("=")[2]
 								end
 							end
