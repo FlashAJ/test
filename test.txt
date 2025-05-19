@@ -1132,7 +1132,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.8",
+    SubTitle = "ver. 2.5.9",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1670,6 +1670,8 @@ do
 							if Options.PetsL.Value and Options.PetsL.Value ~= v.id then
 							else
 								local n = 0
+								local potns = {}
+								local p1 = ""
 								--con_log(v.properties.age, v.id)
 								--pet_id = v.unique
 								uf_pet_age = v.properties.age
@@ -1678,11 +1680,11 @@ do
 								ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(uniq)
 								--con_log("scanning potion...")
 								local check_pition = false
-								for _, Potion in next,require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
+								for i, Potion in next,require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
 									if not Options.AU.Value then
 										return
 									end
-									if Potion.id:find("pet_age_potion") then
+									if Potion.id == "pet_age_potion" then
 										n = n + 1
 										check_pition = true
 										if first_start then
@@ -1690,46 +1692,61 @@ do
 											first_start = false
 											Options.Farm:SetValue(false)
 										end
-										local t=os.time()
-										local before = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed
-										ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject",true):InvokeServer("__Enum_PetObjectCreatorType_2",{["unique_id"] = Potion.unique,["possible_grabber_pet_unique"] = uniq,["pet_unique"] = uniq,["grab_immediately"] = false})
-										--ReplicatedStorage:FindFirstChild("PetAPI/ConsumeFoodItem",true):FireServer(Potion.unique, uniq)
-										--if not ultra_fast_potion then
-											--ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(uniq)
-										--end
-										
-										local Pets_chk = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets
-										con_log("bottles: "..tostring(n).."|age: "..tostring(Pets_chk[uniq].properties.age), "Pet: "..tostring(Pets_chk[uniq].id))----
-										
-										--for _, vvv in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
-											--if vvv.unique == uniq then
-												--con_log("bottles: "..tostring(n).."|age: "..tostring(vvv.properties.age), "Pet: "..tostring(vvv.id))----
-												--pet_age = vvv.properties.age
-											--end
-										--end
-										
-										
-										while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before do
-											wait()
-										end
-										if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.age == 6 then
+										if n == 10 then
 											break
+										elseif n == 1 then
+											p1 = i
+										else
+											table.insert(potns, i)
 										end
-										con_log(os.time()-t, "sec:")
-										--if not ultra_fast_potion then
-										ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(uniq)
-										ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(uniq)
-										--end
-										--if pet_age == 6 then
-											--break
-										--end
-										--wait(1)
-										--if n >= 5 then
-											--break
-										--end
 									end
 								end
-								if not check_pition then
+								
+								if check_pition then								
+									local t=os.time()
+									local before = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed
+									--ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject",true):InvokeServer("__Enum_PetObjectCreatorType_2",{["unique_id"] = Potion.unique,["possible_grabber_pet_unique"] = uniq,["pet_unique"] = uniq,["grab_immediately"] = false})
+									ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject",true):InvokeServer("__Enum_PetObjectCreatorType_2", {
+									["additional_consume_uniques"] = {unpack(potns)},
+									["pet_unique"] = uniq,
+									["unique_id"] = p1
+									})										
+									--ReplicatedStorage:FindFirstChild("PetAPI/ConsumeFoodItem",true):FireServer(Potion.unique, uniq)
+									--if not ultra_fast_potion then
+										--ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(uniq)
+									--end
+									
+									local Pets_chk = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets
+									con_log("age: "..tostring(Pets_chk[uniq].properties.age), "Pet: "..tostring(Pets_chk[uniq].id))----
+									--con_log("bottles: "..tostring(n).."|age: "..tostring(Pets_chk[uniq].properties.age), "Pet: "..tostring(Pets_chk[uniq].id))----
+									
+									--for _, vvv in pairs(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets) do
+										--if vvv.unique == uniq then
+											--con_log("bottles: "..tostring(n).."|age: "..tostring(vvv.properties.age), "Pet: "..tostring(vvv.id))----
+											--pet_age = vvv.properties.age
+										--end
+									--end
+									
+									while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before and os.time()-t < 8 do
+										wait()
+									end
+									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.age == 6 then
+										break
+									end
+									con_log(os.time()-t, "sec:")
+									--if not ultra_fast_potion then
+									ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(uniq)
+									ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(uniq)
+									--end
+									--if pet_age == 6 then
+										--break
+									--end
+									--wait(1)
+									--if n >= 5 then
+										--break
+									--end
+									
+								else
 									con_log("Potion Age-Up not found!")
 									break
 								end
