@@ -1132,7 +1132,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.10",
+    SubTitle = "ver. 2.5.11",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1511,6 +1511,7 @@ do
 																check = false
 																if not buy then
 																	maniq[banker] = nil
+																	kassa[banker] = nil
 																end
 															end
 															local _,err=pcall(function()
@@ -1672,7 +1673,7 @@ do
 							n=n+1
 						end
 					end
-					con_log(n)
+					con_log(n)----
 					for uniq, v in Pets do
 						if Options.PetsL.Value and Options.PetsL.Value ~= v then
 						else
