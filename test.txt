@@ -1132,7 +1132,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.5.11",
+    SubTitle = "ver. 2.6.1",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1345,8 +1345,9 @@ do
 	local m_bankers = {}
 	local kassa = {}
 	local maniq = {}
-	local bank_mode = {}
+	local bank_mode
 	local m_timer = 0
+	local users = {}
     local Toggle = Tabs.Manag:AddToggle("Trans", {Title = "Transfer bucks", Default = false})--manager~=""})
 	Toggle:OnChanged(function()
 		--spawn(function()
@@ -1361,246 +1362,253 @@ do
 					local _,err=pcall(function()
 						----
 						if #m_bankers > 0 then
+							local tmp_tmr = {}
+							for _,usr in m_bankers do
+								table.insert(tmp_tmr, usr[1])
+							end
 							--con_log(os.time() - m_timer, #m_bankers)
 							--Options.Trans:SetTitle("Transfer bucks "..tostring(os.time() - m_timer).." sec.")
-							Options.Trans:SetTitle("after "..tostring(os.time() - m_timer).." sec.")
+							--Options.Trans:SetTitle("after "..tostring(math.min(unpack(tmp_tmr)) - os.time()).." sec.")
+							Options.Trans:SetTitle("after "..tostring(math.max(unpack(tmp_tmr)) - os.time()).." sec.")
 						end
 						----
 						local _,err=pcall(function()
-							res = game:HttpGet("http://"..manager.."/ready")
+							local bal
+							bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
+							res = game:HttpGet("http://"..manager.."/ready&"..Player.Name.."="..tostring(bal))
 							local tmp = string.split(res, ":")
-							if #tmp > 1 then
+							users = {}
+							if res ~= "" then
 								for _,i in tmp do
-									if not table.find(m_bankers, i:split("=")[1]) then
-										table.insert(m_bankers, i:split("=")[1])
-										bank_mode[i:split("=")[1]] = i:split("=")[2]
-									else
-										bank_mode[i:split("=")[1]] = i:split("=")[2]
+									users[i:split("=")[1]] = i:split("=")[2]
+									local chk = true
+									for _,usr in m_bankers do
+										if usr[2] == i:split("=")[1] then
+											chk = false
+										end
+									end
+									if chk then
+										table.insert(m_bankers, {os.time(), i:split("=")[1]})
+										table.insert(m_bankers, {os.time(), i:split("=")[1]})
+										table.insert(m_bankers, {os.time(), i:split("=")[1]})
 									end
 								end
-							elseif res ~= "" then
-								if not table.find(m_bankers, res:split("=")[1]) then
-									table.insert(m_bankers, res:split("=")[1])
-									bank_mode[res:split("=")[1]] = res:split("=")[2]
-								else
-									bank_mode[res:split("=")[1]] = res:split("=")[2]
+								for i,usr in m_bankers do
+									if not users[usr[2]] then
+										m_bankers[i] = nil
+									elseif users[usr[2]] == "3" and os.time() - i > 2 then
+										m_bankers[i] = nil
+										table.insert(m_bankers, {os.time(), usr[2]})
+									end
+								end
+							else
+								for i,v in m_bankers do
+									m_bankers[i] = nil
+									--maniq[v[2]] = nil
+									--kassa[v[2]] = nil
 								end
 							end
 						end)if err then con_log(err) end
 						
-						if os.time() - m_timer >= 120 then
-							if #m_bankers > 0 then
-								local first_bankers = {}
-								local flag
-								while true do
-									for b_n, banker in m_bankers do
-										if table.find(first_bankers, banker) then
-										else
-											local res
-											local n = 0
-											while wait(1) and n < 3 and started and not Fluent.Unloaded do
-												local ready
-												local check,ans=pcall(function()
-													local tmp = Players[banker]
-													local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[banker].char_wrapper_raw.location
+						for _,usr in m_bankers do
+							local banker = usr[2]
+							local chk_respons
+							local _,err=pcall(function()
+								if usr[1] - os.time() <= 0 then
+									local ready,ans=pcall(function()
+										local tmp = Players[banker]
+										local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[banker].char_wrapper_raw.location
+									end)if ans then con_log(ans, banker) end
+									if ready then
+										local ready = true
+										if users[banker] ~= "0" then
+											--con_log(kassa[banker])-------
+											if users[banker] == "3" or (users[banker] == "1" and not kassa[banker]) or (users[banker] == "2" and not maniq[banker]) then
+												local scan_timeout = os.time()
+												while true do
 													ready = true
-												end)if ans then con_log(ans, banker) end
-												if ready then
-													if not kassa[banker] and not maniq[banker] then
-														local home = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model")
-														if not home or home.Name ~= banker then
-															if busy then
-																break
-															end
+													local home = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model")
+													if not home or home.Name ~= banker then
+														if busy then
+															ready = false
+														else
 															busy = true
-															--ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-															GoToHome(banker)
-															--wait(2)
-															--Pets()
+															local _,err=pcall(function()
+																GoToHome(banker)
+															end)
+															if err then
+																ready = false
+															end
 															busy = false
 														end
-														con_log(bank_mode[banker], type(bank_mode[banker]))
-														if bank_mode[banker] == "1" then
-															local fur = Furniture(cashbox)
-															if not fur then
-																con_log("cashregister not found!")
-																break
-															end
-															kassa[banker] = fur
-														else
-															for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
-																if v.id == "mannequins_2024_mannequin" then
-																	--con_log(v.outfit_version, i)
-																	if v.price == 100 then
-																		maniq[banker] = {i, v.outfit_version, v.outfit_name}
-																	end
+													end
+													if ready then
+														local prs
+														local tr_mode
+														for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
+															if v.id == "mannequins_2024_mannequin" then
+																if v.price == 100 then
+																	maniq[banker] = {i, v.outfit_version, v.outfit_name}
+																	tr_mode = "2"
+																else
+																	prs = v.price
 																end
 															end
-															if not maniq[banker] then
-																con_log("mannequins not found!")
-																break
+														end
+														if not maniq[banker] then
+															if prs then
+																con_log(prs, "price for mannequin not 100:")
+															else
+																if users[banker] ~= "2" then
+																	con_log("search cashbox...", "mannequins not found")
+																	kassa[banker] = Furniture(cashbox)
+																	if not kassa[banker] then
+																		con_log("cashregister not found!")
+																		ready = false
+																	else
+																		tr_mode = "1"
+																	end
+																else
+																	con_log("mannequins not found!")
+																	wait(1)
+																	ready = false
+																end
 															end
 														end
-														
-														spawn(function()
-															wait()
-															while busy and farm do
-																wait(.1)
-															end
-															busy = true
-															--ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-															GoToHome()
-															--wait(2)
-															--ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
-															wait()
-															busy = false
-														end)
-														
+														if (tr_mode and users[banker] == "3") or (tr_mode == "2" and tr_mode ~= users[banker]) then
+															con_log(tr_mode, users[banker])------
+															local _,err=pcall(function()
+																game:HttpGet("http://"..manager.."/mode="..banker.."="..tr_mode)
+																users[banker] = tr_mode
+															end)if err then con_log(err) end
+														end
 													end
-													
-													local _,err=pcall(function()
-														res = game:HttpGet("http://"..manager.."/user="..banker)
-													end)if err then con_log(err) break end
-													if res == "busy" then
-													elseif res == "" or res == "error" then
-														table.remove(m_bankers, table.find(m_bankers, banker))
-														--if bank_mode[banker] == "1" then
-															kassa[banker] = nil
-														--else
-															maniq[banker] = nil
-														--end
-														bank_mode[banker] = nil
+													if users[banker] == "3" and not maniq[banker] and not kassa[banker] and os.time()-scan_timeout < 120 then
+														con_log(os.time()-scan_timeout)
+														wait(1)
+													else
 														break
-													elseif string.find(res, banker) then
-														local amount = string.split(res, ":")[2]
-														if amount == "done" then
-															table.remove(m_bankers, table.find(m_bankers, banker))
-															--if bank_mode[banker] == "1" then
-																kassa[banker] = nil
-															--else
-																maniq[banker] = nil
-															--end
-															bank_mode[banker] = nil
-															break
-														else
-															local buy
-															local bal
-															bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
-															local tmp_time = os.time()
-															if bank_mode[banker] == "1" then
-																pcall(function()
-																	ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[banker], kassa[banker], "UseBlock", tonumber(amount), Player.Character)
-																	buy = true
-																end)
-															else
-																amount = 100
-																pcall(function()
-																	ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
-																end)
-																local _,err_ch=pcall(function()
-																	buy = ReplicatedStorage.API["AvatarAPI/BuyMannequinOutfit"]:InvokeServer(Players[banker], maniq[banker][1], maniq[banker][2], tonumber(amount))
-																	--con_log(buy)
-																	wait()
-																	ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
-																end)if err_ch then con_log(err_ch, 1495)end
+													end
+												end
+											end
+											if ready then
+												local res
+												local _,err=pcall(function()
+													res = game:HttpGet("http://"..manager.."/user="..banker)
+													chk_respons = true
+												end)if err then con_log(err) end
+												if res == "busy" then
+												elseif res == "" or res == "error" then
+													for i,v in m_bankers do
+														if v[2] == banker then
+															m_bankers[i] = nil
+															maniq[banker] = nil
+															kassa[banker] = nil
+														end
+													end
+												elseif string.find(res, banker) then
+													local amount = string.split(res, ":")[2]
+													if amount == "done" then
+														maniq[banker] = nil
+														kassa[banker] = nil
+														for i,v in m_bankers do
+															if v[2] == banker then
+																m_bankers[i] = nil
 															end
+														end
+													else
+														local tr_mode = string.split(res, ":")[3]
+														users[banker] = tr_mode
+														local buy
+														local bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
+														local tmp_time = os.time()
+														if tr_mode == "1" and kassa[banker] then
+															pcall(function()
+																ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[banker], kassa[banker], "UseBlock", tonumber(amount), Player.Character)
+																buy = true
+															end)
+														elseif tr_mode == "2" and maniq[banker] then
+															amount = 100
+															pcall(function()
+																ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
+															end)
+															local _,err_ch=pcall(function()
+																buy = ReplicatedStorage.API["AvatarAPI/BuyMannequinOutfit"]:InvokeServer(Players[banker], maniq[banker][1], maniq[banker][2], tonumber(amount))
+																wait()
+																ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", maniq[banker][3])
+															end)if err_ch then con_log(err_ch, 1495)end
+														end
+														if tr_mode ~= "0" and tr_mode ~= "3" then
+															usr[1] = os.time() + 120
 															bal = bal - require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
 															con_log(tostring(bal).." ("..tostring(os.time()-tmp_time).."sec.)", tostring(banker).." send:")
 															local check = true
-															if bal < 7 or not buy then --os.time()-tmp_time < 1 and 
+															if not buy then
 																check = false
-																if not buy then
-																	maniq[banker] = nil
-																	kassa[banker] = nil
-																end
+																maniq[banker] = nil
+																kassa[banker] = nil
+															end
+															if buy and bal < 7 and tr_mode == "1" then
+																kassa[banker] = nil
 															end
 															local _,err=pcall(function()
 																res = game:HttpGet("http://"..manager.."/done="..banker.."&"..amount.."&"..Player.Name.."&"..tostring(check).."&"..tostring(os.time()-tmp_time))
-															end)if err then con_log(err) break end
-															n = n + 1
-															flag = true
-															if n == 1 and b_n == 1 then
-																m_timer = os.time() + 5
-															end
-															table.insert(first_bankers, banker)
+															end)if err then con_log(err) end
 														end
-													else
-														con_log(res)
-														n = n + 1
 													end
 												else
-													kassa[banker] = nil
-													maniq[banker] = nil
-													if table.find(m_bankers, banker) then
-														table.remove(m_bankers, table.find(m_bankers, banker))
+													con_log(res)
+												end
+												local home = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model")
+												if home and home.Name == banker then
+													if not busy then
+														busy = true
+														local _,err=pcall(function()
+															GoToHome()
+														end)
+														busy = false
 													end
-													bank_mode[banker] = nil
-													break
+												end
+												if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" then
+													if not busy then
+														busy = true
+														local _,err=pcall(function()
+															ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
+															Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+															Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+														end)
+														busy = false
+													end
 												end
 											end
 										end
-									end
-								
-									local chk
-									local _,err=pcall(function()
-										res = game:HttpGet("http://"..manager.."/ready")
-										local tmp = string.split(res, ":")
-										if #tmp > 1 then
-											for _,i in tmp do
-												if not table.find(m_bankers, i:split("=")[1]) then
-													table.insert(m_bankers, i:split("=")[1])
-													bank_mode[i:split("=")[1]] = i:split("=")[2]
-													chk = true
-												end
-											end
-										elseif res ~= "" then
-											if not table.find(m_bankers, res:split("=")[1]) then
-												table.insert(m_bankers, res:split("=")[1])
-												bank_mode[i:split("=")[1]] = i:split("=")[2]
-												chk = true
+									else
+										for i,v in m_bankers do
+											if v[2] == banker then
+												m_bankers[i] = nil
+												maniq[banker] = nil
+												kassa[banker] = nil
 											end
 										end
-									end)if err then con_log(err) end
-									
-									if flag then
-										if #m_bankers < 3 then
-											m_timer = os.time()
-										end
+										wait(1)
 									end
-									if not chk then
-										break
-									end
-									
 								end
-								
-							end
-						elseif #m_bankers > 0 then
-							for _, banker in m_bankers do
-								local ready
-								local check,ans=pcall(function()
-									local tmp = Players[banker]
-									local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[banker].char_wrapper_raw.location
-									ready = true
-								end)if ans then con_log(ans, banker) end
-								if not ready then
-									kassa[banker] = nil
-									maniq[banker] = nil
-									if table.find(m_bankers, banker) then
-										table.remove(m_bankers, table.find(m_bankers, banker))
-									end
-									bank_mode[banker] = nil
+							end)
+							if err then
+								con_log(err)
+								busy = false
+								if chk_respons then
+									local _,err=pcall(function()
+										res = game:HttpGet("http://"..manager.."/done="..banker.."&".."0".."&"..Player.Name.."&"..tostring(false).."&"..tostring(os.time()-os.time()))
+									end)if err then con_log(err) end
 								end
 							end
 						end
-					end)--if err then con_log(err) end
+					
+					end)
 					----
 					if err then
 						con_log(err)
-						--spawn(function()
-							--started = false
-							--wait(2)
-							--started = true
-						--end)
 						busy = false
 					end
 					----
