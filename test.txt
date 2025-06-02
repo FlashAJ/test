@@ -462,7 +462,8 @@ function GoToHome(Name)
 	--Workspace.Gravity = 0
 	SetLocation("housing", "MainDoor", {["house_owner"] = Pl}) wait()
 	local tmp
-    while tmp==nil and farm do
+	local tmr = os.time()
+    while tmp==nil and farm and os.time()-tmr < 100 do
 		wait(1)
 		local _,err=pcall(function()
 			tmp = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model")
@@ -570,7 +571,7 @@ end)if err then
 end
 --]===]
 
-
+ReplicatedStorage.API:FindFirstChild("HousingAPI/SetDoorLocked"):InvokeServer(true)
 
 
 local function care(c, baby)
@@ -1132,7 +1133,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.1",
+    SubTitle = "ver. 2.6.2",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1523,10 +1524,16 @@ do
 														local bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
 														local tmp_time = os.time()
 														if tr_mode == "1" and kassa[banker] then
-															pcall(function()
-																ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[banker], kassa[banker], "UseBlock", tonumber(amount), Player.Character)
-																buy = true
-															end)
+															local k_chk = string.split(res, ":")[4]
+															if not k_chk then
+																k_chk = 0
+															end
+															if tonumber(k_chk) > 0 then
+																pcall(function()
+																	ReplicatedStorage.API["HousingAPI/ActivateFurniture"]:InvokeServer(Players[banker], kassa[banker], "UseBlock", tonumber(amount), Player.Character)
+																	buy = true
+																end)
+															end
 														elseif tr_mode == "2" and maniq[banker] then
 															amount = 100
 															pcall(function()
@@ -1569,17 +1576,6 @@ do
 														busy = false
 													end
 												end
-												if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" then
-													if not busy then
-														busy = true
-														local _,err=pcall(function()
-															ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
-															Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
-															Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
-														end)
-														busy = false
-													end
-												end
 											end
 										end
 									else
@@ -1591,6 +1587,17 @@ do
 											end
 										end
 										wait(1)
+									end
+									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" then
+										--if not busy then
+											busy = true
+											local _,err=pcall(function()
+												ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
+												Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+												Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+											end)
+											busy = false
+										--end
 									end
 								end
 							end)
@@ -1613,7 +1620,11 @@ do
 					end
 					----
 				end
-			end)if err then con_log(err); busy = false end
+			end)
+			if err then
+				con_log(err)
+				busy = false
+			end
 		end
     end)
 
@@ -1743,7 +1754,7 @@ do
 									--end
 								--end
 								
-								while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before and os.time()-t < 8 do
+								while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before and os.time()-t < 10 do
 									wait()
 								end
 								con_log(os.time()-t, "sec:")
