@@ -468,6 +468,7 @@ function GoToHome(Name)
 		local _,err=pcall(function()
 			tmp = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model")
 		end)if err then con_log(err)end
+		con_log("", os.time()-tmr)
     end
 	--[=[
 	if Name then
@@ -1133,7 +1134,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.2",
+    SubTitle = "ver. 2.6.3",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1433,12 +1434,22 @@ do
 														if busy then
 															ready = false
 														else
-															busy = true
+															--busy = true
 															local _,err=pcall(function()
-																GoToHome(banker)
+																--wait(2)
+																con_log(banker.." ("..tostring(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id)..")", "Teleport to:")
+																local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[banker].char_wrapper_raw.location
+																busy = true
+																if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture or
+																require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" then
+																	ready = false
+																else
+																	GoToHome(banker)
+																end
 															end)
 															if err then
 																ready = false
+																con_log(err)
 															end
 															busy = false
 														end
@@ -1484,7 +1495,7 @@ do
 															end)if err then con_log(err) end
 														end
 													end
-													if users[banker] == "3" and not maniq[banker] and not kassa[banker] and os.time()-scan_timeout < 120 then
+													if users[banker] == "3" and not maniq[banker] and not kassa[banker] and os.time()-scan_timeout < 40 then
 														con_log(os.time()-scan_timeout)
 														wait(1)
 													else
@@ -1571,7 +1582,9 @@ do
 													if not busy then
 														busy = true
 														local _,err=pcall(function()
-															GoToHome()
+															if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture then
+																GoToHome()
+															end
 														end)
 														busy = false
 													end
@@ -1588,11 +1601,23 @@ do
 										end
 										wait(1)
 									end
-									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" then
+									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" and
+									require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture then
 										--if not busy then
 											busy = true
+											wait(2)
 											local _,err=pcall(function()
+												con_log("babyfarm")----
 												ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
+												local n = 0
+												while n < 20 do
+													wait(1)
+													n = n + 1
+													if Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model") and Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model").Name == Player.Name then
+														break
+													end
+												end
+												wait(2)
 												Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
 												Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 											end)
@@ -2219,7 +2244,7 @@ function()
 				
 				busy = false
 			elseif busy then
-				con_log("","busy")
+				con_log(busy,"busy")
 			end
 			
 			
