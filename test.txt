@@ -1406,8 +1406,8 @@ do
 							else
 								for i,v in m_bankers do
 									m_bankers[i] = nil
-									--maniq[v[2]] = nil
-									--kassa[v[2]] = nil
+									maniq[v[2]] = nil
+									kassa[v[2]] = nil
 								end
 							end
 						end)if err then con_log(err) end
