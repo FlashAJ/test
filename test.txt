@@ -1134,7 +1134,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.4",
+    SubTitle = "ver. 2.6.3",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1908,15 +1908,11 @@ function()
 		pcall(function()
 			if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
 				if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.Text:find("!") then
-					if #Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren() > 2 or Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.Face.TextLabel.Text == 'Okay' then
+					if #Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren() > 2 then
 						set_thread_identity(2)
 						require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DialogApp", false)
 						set_thread_identity(7)
 					end
-				elseif Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.Face.TextLabel.Text == 'Okay' then
-					set_thread_identity(2)
-					require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DialogApp", false)
-					set_thread_identity(7)
 				end
 			end
 		end)
@@ -1931,14 +1927,6 @@ function()
 				work_time = work_time + (os.time() - work_point)
 				work_point = os.time()
 				--Player.PlayerGui.indicator.Container.Amount.Text = tostring(count).."\n"..tostring(work_time)
-				local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].equip_manager.food[1]
-				if tmp then
-					if tmp.id == "pet_age_potion" then
-						pcall(function()
-							ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(tmp.unique)
-						end)
-					end
-				end
 			end
 			hint = Player.PlayerGui.HintApp.TextLabel.Text
 			if hint ~= last_c then
