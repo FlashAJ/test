@@ -1134,7 +1134,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.4",
+    SubTitle = "ver. 2.6.5",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1910,15 +1910,16 @@ function()
 			if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
 				if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.Text:find("!") then
 					if #Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren() > 2 then
-					--or Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.Face.TextLabel.Text == 'Okay' then
 						set_thread_identity(2)
 						require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DialogApp", false)
 						set_thread_identity(7)
 					end
-				--elseif Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.Face.TextLabel.Text == 'Okay' then
-					--set_thread_identity(2)
-					--require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DialogApp", false)
-					--set_thread_identity(7)
+				end
+				--if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.Face.TextLabel.Text == 'Okay' then
+				if #Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren() < 3 then
+					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1].Function()
+					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1].Function()
+					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
 				end
 			end
 		end)
