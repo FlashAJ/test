@@ -1922,10 +1922,10 @@ function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
 				end
 			end
-			
-			if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025 then
-				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025 > 25 then
-					ReplicatedStorage.API["SocialStonesAPI/AttemptExchange"]:FireServer("food", "butterfly_2025_snapdragon_flower", require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025//25)
+			local tmp=require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025
+			if tmp then
+				if tmp >= 25 then
+					ReplicatedStorage.API["SocialStonesAPI/AttemptExchange"]:FireServer("food", "butterfly_2025_snapdragon_flower", tmp//25)
 					wait(1)
 					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
 						if v.id == "butterfly_2025_snapdragon_flower" then
