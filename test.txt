@@ -1134,7 +1134,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.5",
+    SubTitle = "ver. 2.6.6",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1920,6 +1920,18 @@ function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1].Function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1].Function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+				end
+			end
+			
+			if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025 then
+				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025 > 25 then
+					ReplicatedStorage.API["SocialStonesAPI/AttemptExchange"]:FireServer("food", "butterfly_2025_snapdragon_flower", require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025//25)
+					wait(1)
+					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
+						if v.id == "butterfly_2025_snapdragon_flower" then
+							ReplicatedStorage.API["LootBoxAPI/ExchangeItemForReward"]:InvokeServer(v.id, i)
+						end
+					end
 				end
 			end
 		end)
