@@ -1116,7 +1116,7 @@ local kassa = {}
 
 local Ps = {}
 local PetsList = {}
-local ultra_fast_potion = false
+local make_neon = false
 
 local Fluent
 local _,err=pcall(function()
@@ -1134,7 +1134,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.6",
+    SubTitle = "ver. 2.6.7",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1688,9 +1688,9 @@ do
 		Options.PetsL.Close()
 	end)
 					
-    local Toggle = Tabs.AgeUp:AddToggle("uf", {Title = "ON/OFF Ultra fast mode\n(use with caution!)", Default = false})
+    local Toggle = Tabs.AgeUp:AddToggle("uf", {Title = "ON/OFF make auto NEON", Default = true})
     Toggle:OnChanged(function()
-		ultra_fast_potion = Options.uf.Value
+		make_neon = Options.uf.Value
 		--if Options.AU.Value then
 			--spawn(function()
 			--end)
@@ -1718,7 +1718,7 @@ do
 							n=n+1
 						end
 					end
-					con_log(n)----
+					con_log(n, "Pets:")----
 					for uniq, v in Pets do
 						if Options.PetsL.Value and Options.PetsL.Value ~= v then
 						else
@@ -1745,7 +1745,7 @@ do
 										first_start = false
 										Options.Farm:SetValue(false)
 									end
-									if n == 10 then
+									if n == 11 then
 										break
 									elseif n == 1 then
 										p1 = i
@@ -1780,7 +1780,8 @@ do
 									--end
 								--end
 								
-								while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before and os.time()-t < 10 do
+								while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before and os.time()-t < 15 and
+								require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.age ~= 6 do
 									wait()
 								end
 								con_log(os.time()-t, "sec:")
@@ -1805,8 +1806,41 @@ do
 					end
 					Options.AU:SetValue(false)
 					
-				end)if err then con_log(err, "Error Age Up:")end			
-			
+				end)if err then con_log(err, "Error Age Up:")end
+				
+				if make_neon then
+					_,err=pcall(function()
+						local Pets = {}
+						local created
+						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+							--if v.properties.age ~= 6 and v.id ~= "practice_dog" and not endswith(v.id, "_egg") then
+							if v.properties.age == 6 and not v.properties.neon and not v.properties.mega_neon then
+								if not Pets[v.id] then
+									Pets[v.id] = {}
+								end
+								table.insert(Pets[v.id], v.unique)
+							end
+						end
+						for i, v in Pets do
+							if #v < 4 then
+							else
+								local Spec={}
+								for n=1, #v//4 do
+									local tmp = (n-1)*4
+									local res = ReplicatedStorage.API["PetAPI/DoNeonFusion"]:InvokeServer({v[tmp+1], v[tmp+2], v[tmp+3], v[tmp+4]})
+									if res then
+										created = true
+										con_log(i, "Create neon:")
+									end
+								end
+							end
+						end
+						if created then
+							Options.AU:SetValue(true)
+						end
+					
+					end)if err then con_log(err, "Error make Neon:")end
+				end
 			
 			end)
 		end
