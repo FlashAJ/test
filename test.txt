@@ -1134,7 +1134,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.7",
+    SubTitle = "ver. 2.6.8",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1687,6 +1687,42 @@ do
 	Dropdown:OnChanged(function(Value)
 		Options.PetsL.Close()
 	end)
+
+    local Toggle = Tabs.AgeUp:AddToggle("MN", {Title = "MAKE MEGA-NEON", Default = false})
+    Toggle:OnChanged(function()
+		if Options.MN.Value then
+			spawn(function()
+				local _,err=pcall(function()
+					local Pets = {}
+					for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+						if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
+							if not Pets[v.id] then
+								Pets[v.id] = {}
+							end
+							table.insert(Pets[v.id], v.unique)
+						end
+					end
+					for i, v in Pets do
+						if #v < 4 then
+						else
+							local Spec={}
+							for n=1, #v//4 do
+								local tmp = (n-1)*4
+								local res = ReplicatedStorage.API["PetAPI/DoNeonFusion"]:InvokeServer({v[tmp+1], v[tmp+2], v[tmp+3], v[tmp+4]})
+								if res then
+									con_log(i, "Create mega-neon:")
+								end
+							end
+						end
+					end
+					--if created then
+						Options.MN:SetValue(false)
+					--end
+				
+				end)if err then con_log(err, "Error make Neon:")end
+			end)
+		end
+	end)
 					
     local Toggle = Tabs.AgeUp:AddToggle("uf", {Title = "ON/OFF make auto NEON", Default = true})
     Toggle:OnChanged(function()
@@ -1809,11 +1845,11 @@ do
 				end)if err then con_log(err, "Error Age Up:")end
 				
 				if make_neon then
-					_,err=pcall(function()
+					local _,err=pcall(function()
 						local Pets = {}
 						local created
 						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-							--if v.properties.age ~= 6 and v.id ~= "practice_dog" and not endswith(v.id, "_egg") then
+							--if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
 							if v.properties.age == 6 and not v.properties.neon and not v.properties.mega_neon then
 								if not Pets[v.id] then
 									Pets[v.id] = {}
