@@ -220,6 +220,11 @@ local busy
 local lur
 local lur_time = 0
 
+local is_manager = isfile("manager.txt")
+if is_manager then
+	delfile("manager.txt")
+end
+
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
@@ -1134,7 +1139,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.8",
+    SubTitle = "ver. 2.6.9",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1162,7 +1167,7 @@ do
     --    Duration = 10 -- Set to nil to make the notification not disappear
     --})
         
-    local Toggle = Tabs.Main:AddToggle("Farm", {Title = "Farm", Default = false})
+    local Toggle = Tabs.Main:AddToggle("Farm", {Title = "Farm", Default = true})
     Toggle:OnChanged(function()
 		if Options.Farm.Value and exper then
 			con_log("", "Farm started")
@@ -1376,8 +1381,14 @@ do
 						----
 						local _,err=pcall(function()
 							local bal
+							local n = 0
 							bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
-							res = game:HttpGet("http://"..manager.."/ready&"..Player.Name.."="..tostring(bal))
+							for i, Potion in next,require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
+								if Potion.id == "pet_age_potion" then
+									n = n + 1
+								end
+							end
+							res = game:HttpGet("http://"..manager.."/ready&"..Player.Name.."="..tostring(bal).."&Potion="..tostring(n))
 							local tmp = string.split(res, ":")
 							users = {}
 							if res ~= "" then
@@ -1962,7 +1973,15 @@ Fluent:Notify({
 
 SaveManager:LoadAutoloadConfig()
 
-
+_,err=pcall(function()
+game:GetService("CoreGui").ScreenGui:GetChildren()[2].Position = UDim2.new(0,50,0,50)
+--Window.Position = UDim2.new(0.25, 0, 0.5, 0)
+--Window.Position = Vector2.new(50,50)
+--con_log(Window.Position)
+end)
+if err then
+con_log(err)
+end
 
 
 local event_flag = true
@@ -2054,6 +2073,8 @@ coroutine.wrap(
 function()
 	local timer_b = 0
 	local redstr_flag
+	local bal
+	local wfile_flag = true
 	
 	while not Fluent.Unloaded do
 		wait(1)
@@ -2080,6 +2101,17 @@ function()
 				end
 			end)
 			--]=]
+			
+			if is_manager then
+				if bal ~= require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money then
+					bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
+					writefile("balances.txt", tostring(bal))
+				end
+			elseif wfile_flag then
+				writefile("balances.txt", "-1")
+				wfile_flag = false
+			end
+			
 			if farm and not busy then
 				busy = true
 				local _,err=pcall(function()
@@ -2500,8 +2532,8 @@ function()
 	con_log("thread script stopped!")
 end)()
 
-
-
+wait(5)
+Options.Trans:SetValue(true)
 
 
 --]]
