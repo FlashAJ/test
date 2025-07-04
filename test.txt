@@ -113,7 +113,7 @@ local cashbox = {
     "GoldenCashRegister",
 }
 
-local Tasks = {
+local Tasks = {		--this for information!
     "hungry",
     "sleepy",
     "thirsty",
@@ -143,6 +143,8 @@ local street_task = {
     "bored",
     "beach_party",
     "camping",
+    "buccaneer_band",
+    "summerfest_bonfire",
 }
 local wend_task = {
 	"pet_me",
