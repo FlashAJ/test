@@ -206,7 +206,7 @@ local cards = {
 	["Dirty!"] = "dirty",
 	["Pet Me!"] = "pet_me",
 	["Buccaneer Band!"] = "buccaneer_band",
-    ["Summerfest Bonfire!"] = "summerfest_bonfire",
+    ["Beach Bonfire!"] = "summerfest_bonfire",
 }
 
 
