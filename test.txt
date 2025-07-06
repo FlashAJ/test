@@ -205,6 +205,8 @@ local cards = {
 	["Sleepy!"] = "sleepy",
 	["Dirty!"] = "dirty",
 	["Pet Me!"] = "pet_me",
+	["Buccaneer Band!"] = "buccaneer_band",
+    ["Summerfest Bonfire!"] = "summerfest_bonfire",
 }
 
 
@@ -1141,7 +1143,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.9",
+    SubTitle = "ver. 2.6.10",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
