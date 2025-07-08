@@ -2527,7 +2527,7 @@ function()
 					busy = false
 				end
 			elseif busy then
-				con_log(event_flag,"busy")
+				--con_log(event_flag,"busy")
 			end
 			
 			
