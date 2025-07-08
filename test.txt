@@ -15,9 +15,9 @@ if #game:GetService("Players"):GetChildren() > 1 then
 else
 	con_log("","waiting ready server...")
 	for i=1,10 do
-		if game:GetService("Players").LocalPlayer.PlayerGui.NewsApp.Enabled then
-			break
-		end
+		--if game:GetService("Players").LocalPlayer.PlayerGui.NewsApp.Enabled then
+			--break
+		--end
 		wait(1)
 	end
 end
