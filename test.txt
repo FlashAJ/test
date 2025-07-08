@@ -929,10 +929,13 @@ work = {
 
 local function red_work(c)
 	if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
-		if Workspace.Interiors:FindFirstChildWhichIsA("Model").Name ~= red_name[c] then
+		--if Workspace.Interiors:FindFirstChildWhichIsA("Model").Name ~= red_name[c] then
+		if not Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find(red_name[c]) then
+			con_log("tp1")----
 			GoToStore(red_name[c])
 		end
 	else
+		con_log("tp2")----
 		GoToStore(red_name[c])
 	end
 	if c == "sick" then
@@ -1193,7 +1196,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.11",
+    SubTitle = "ver. 2.6.12",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2038,7 +2041,7 @@ con_log(err)
 end
 
 
-local event_flag = true
+local event_flag
 local event_t = 0
 
 coroutine.wrap(
@@ -2065,6 +2068,15 @@ function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
 				end
 			end
+			if Player.PlayerGui.MinigameRewardsApp.Body.Visible then
+				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Down)[1].Function()
+				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Down)[1]:Fire()
+				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Up)[1].Function()
+				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Up)[1]:Fire()
+				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1].Function()
+				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1]:Fire()
+			end
+			--[==[
 			local tmp=require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025
 			if tmp then
 				if tmp >= 25 then
@@ -2077,12 +2089,70 @@ function()
 					end
 				end
 			end
+			--]==]
 		end)
 		
-		if os.date("!*t").min % 10 == 0 and os.time() - event_t > 60 then
-			event_flag = true
-			event_t = os.time()
+		---[===[
+		if (os.date("!*t").min-1) % 10 == 0 or ((os.date("!*t").min-2) % 10 == 0 and os.date("!*t").sec <= 40) then
+			local _,err=pcall(function()
+				event_flag = true
+				busy = true
+				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
+					if not Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
+						GoToStore("MainMap")
+					end
+				else
+					GoToStore("MainMap")
+				end
+				Player.Character.HumanoidRootPart.CFrame = CFrame.new(-590, 35, -1670)
+				local t = os.time()
+				local flag = true
+				while farm do
+					_,chk=pcall(function()
+						local tmp = Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton
+					end)
+					if not chk then
+						break 
+					end
+					if os.time()-t > 150 then
+						flag = false
+						break
+					end
+					wait(.1)
+				end
+				if flag then
+					wait(5)
+					if Player.Character.HumanoidRootPart.Position.X > 0 then
+						Player.Character.HumanoidRootPart.CFrame = CFrame.new(12023, 9899, 5989)
+					else
+						--Player.Character.HumanoidRootPart.CFrame = CFrame.new(-12023, 9899, 8989)
+						Player.Character.HumanoidRootPart.CFrame = CFrame.new(-11977, 9899, 8989)
+					end
+					Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+					local _,chk=pcall(function()
+					local t=os.time()
+						while os.time()-t < 120 do
+							getconnections(Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton.Button.MouseButton1Down)[1].Function()
+							getconnections(Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton.Button.MouseButton1Down)[1]:Fire()
+							wait(.5)
+						end
+					end)
+					wait(30)
+					Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+				end
+				con_log("", "event done")
+				busy = false
+				event_flag = false
+			end)
+			if err then
+				con_log(err)
+				event_flag = false
+				busy = false
+			end
+		--else
+			--event_flag = false
 		end
+		--]===]
 		
 		local _,err=pcall(function()
 			if farm then
@@ -2166,26 +2236,8 @@ function()
 				wfile_flag = false
 			end
 			
-			if farm and not busy then
+			if farm and not busy and not event_flag then
 				busy = true
-				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "MainMap" then
-					if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments["summerfest_bonfire"] then
-						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
-							if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID]["summerfest_bonfire"] then
-								GoToHome()
-								wait(2)
-								Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(-7, 100, 3))
-								Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
-							end
-						else
-							GoToHome()
-							wait(2)
-							Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(-7, 100, 3))
-							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
-						end
-					end
-				end
-				
 				local _,err=pcall(function()
 					if GetCurrentPetOut().goal_state.distance_to_owner > 50 or tostring(GetCurrentPetOut().goal_state.distance_to_owner) == "nan" then
 						con_log(GetCurrentPetOut().goal_state.distance_to_owner)-------
@@ -2207,6 +2259,30 @@ function()
 					ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(tmpID)
 					PetID = tmpID
 				end
+				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "MainMap" then
+					if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments["summerfest_bonfire"] then
+						--con_log(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID])----
+						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
+							if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID]["summerfest_bonfire"] then
+								--con_log("","TP1")----
+								Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+								GoToHome()
+								wait(2)
+								Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(-7, 100, 3))
+								Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+							end
+						else
+							--con_log("","TP2")----
+							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+							GoToHome()
+							wait(2)
+							Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(-7, 100, 3))
+							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+						end
+					end
+				end
+				
+				
 				---------------------------------
 				-- get food
 				---[==[
@@ -2260,11 +2336,15 @@ function()
 				-- red tasks --
 				for _,v in red_task do
 					if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[v] then
-						red_work(v)
+						if not event_flag then
+							red_work(v)
+						end
 						break
 					elseif require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
 						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v] then
-							red_work(v)
+							if not event_flag then
+								red_work(v)
+							end
 							break
 						end
 					end
@@ -2443,9 +2523,11 @@ function()
 				
 				---------------------------------
 				
-				busy = false
+				if not event_flag then
+					busy = false
+				end
 			elseif busy then
-				con_log(busy,"busy")
+				con_log(event_flag,"busy")
 			end
 			
 			
