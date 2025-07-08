@@ -11,6 +11,17 @@ function con_log(txt, header)
   })
 end
 con_log("","start loading...")
+if #game:GetService("Players"):GetChildren() > 1 then
+else
+	con_log("","waiting ready server...")
+	for i=1,10 do
+		if game:GetService("Players").LocalPlayer.PlayerGui.NewsApp.Enabled then
+			break
+		end
+		wait(1)
+	end
+end
+
 --[[
 local lighting = game:GetService("Lighting")
 -- Установите яркость на 0
@@ -245,6 +256,7 @@ local VirtualUser = game:GetService("VirtualUser")
 local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
+
 for i,v in next, getconnections(Player.Idled) do v:Disable() end
 
 local _,err=pcall(function()
@@ -254,10 +266,15 @@ local _,err=pcall(function()
 end)if err then con_log("reconnect to the game!", "BAD INJECTION!")end
 
 
+local _,err=pcall(function()
 set_thread_identity(2)
 --require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("MainMenuApp", false)
 require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("NewsApp", false)
 set_thread_identity(7)
+end)
+if err then
+con_log(err)
+end
 
 local _,err=pcall(function()
 	_=Workspace.Pstone
@@ -2072,9 +2089,9 @@ function()
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Down)[1].Function()
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Down)[1]:Fire()
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Up)[1].Function()
-				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Up)[1]:Fire()
+				--getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Up)[1]:Fire()
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1].Function()
-				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1]:Fire()
+				--getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1]:Fire()
 			end
 			--[==[
 			local tmp=require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025
