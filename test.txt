@@ -2216,6 +2216,7 @@ function()
 				end
 				if flag then
 					wait(5)
+					con_log(Player.Character.HumanoidRootPart.Position)---
 					if Player.Character.HumanoidRootPart.Position.X > 0 then
 						Player.Character.HumanoidRootPart.CFrame = CFrame.new(12023, 9899, 5989)
 					else
