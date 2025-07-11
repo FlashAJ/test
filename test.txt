@@ -1226,7 +1226,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.13",
+    SubTitle = "ver. 2.6.14",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2185,68 +2185,74 @@ function()
 		end)
 		
 		---[===[
-		if Options.Event1.Value then
+		if Options.Event1.Value and not busy then
 		
-		if (os.date("!*t").min-1) % 10 == 0 or ((os.date("!*t").min-2) % 10 == 0 and os.date("!*t").sec <= 40) then
-			local _,err=pcall(function()
-				event_flag = true
-				busy = true
-				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
-					if not Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
+			if (os.date("!*t").min-1) % 10 == 0 or ((os.date("!*t").min-2) % 10 == 0 and os.date("!*t").sec <= 40) then
+				local _,err=pcall(function()
+					event_flag = true
+					busy = true
+					if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
+						if not Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
+							GoToStore("MainMap")
+						end
+					else
 						GoToStore("MainMap")
 					end
-				else
-					GoToStore("MainMap")
-				end
-				Player.Character.HumanoidRootPart.CFrame = CFrame.new(-590, 35, -1670)
-				local t = os.time()
-				local flag = true
-				while farm do
-					_,chk=pcall(function()
-						local tmp = Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton
-					end)
-					if not chk then
-						break 
-					end
-					if os.time()-t > 150 then
-						flag = false
-						break
-					end
-					wait(.1)
-				end
-				if flag then
-					wait(5)
-					con_log(Player.Character.HumanoidRootPart.Position)---
-					if Player.Character.HumanoidRootPart.Position.X > 0 then
-						Player.Character.HumanoidRootPart.CFrame = CFrame.new(12023, 9899, 5989)
-					else
-						--Player.Character.HumanoidRootPart.CFrame = CFrame.new(-12023, 9899, 8989)
-						Player.Character.HumanoidRootPart.CFrame = CFrame.new(-11977, 9899, 8989)
-					end
-					Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
-					local _,chk=pcall(function()
-					local t=os.time()
-						while os.time()-t < 120 do
-							getconnections(Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton.Button.MouseButton1Down)[1].Function()
-							getconnections(Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton.Button.MouseButton1Down)[1]:Fire()
-							wait(.5)
+					Player.Character.HumanoidRootPart.CFrame = CFrame.new(-590, 35, -1670)
+					local t = os.time()
+					local flag = true
+					while farm do
+						_,chk=pcall(function()
+							local tmp = Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton
+						end)
+						if not chk then
+							break 
 						end
-					end)
-					wait(30)
-					Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+						if os.time()-t > 150 then
+							flag = false
+							break
+						end
+						wait(.1)
+					end
+					if flag then
+						wait(5)
+						con_log(Player.Character.HumanoidRootPart.Position)---
+						if Player.Character.HumanoidRootPart.Position.X > 0 then
+							Player.Character.HumanoidRootPart.CFrame = CFrame.new(12023, 9899, 5989)
+						else
+							if Player.Character.HumanoidRootPart.Position.X < -9500 then
+								--Player.Character.HumanoidRootPart.CFrame = CFrame.new(-12023, 9899, 8989)
+								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-11977, 9899, 8989)
+							elseif Player.Character.HumanoidRootPart.Position.X < -6500 then
+								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-8977, 9899, 8989)
+							else
+								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-5977, 9899, 8989)
+							end
+						end
+						Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+						local _,chk=pcall(function()
+						local t=os.time()
+							while os.time()-t < 120 do
+								getconnections(Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton.Button.MouseButton1Down)[1].Function()
+								getconnections(Player.PlayerGui.MinigameHotbarApp.Hotbar.SwordButton.Button.MouseButton1Down)[1]:Fire()
+								wait(.5)
+							end
+						end)
+						wait(30)
+						Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+					end
+					con_log("", "event done")
+					busy = false
+					event_flag = false
+				end)
+				if err then
+					con_log(err)
+					event_flag = false
+					busy = false
 				end
-				con_log("", "event done")
-				busy = false
-				event_flag = false
-			end)
-			if err then
-				con_log(err)
-				event_flag = false
-				busy = false
+			--else
+				--event_flag = false
 			end
-		--else
-			--event_flag = false
-		end
 		
 		end
 		--]===]
