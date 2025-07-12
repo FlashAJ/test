@@ -250,6 +250,7 @@ local f_bowl
 
 local farm
 local busy
+local event_on
 
 local lur
 local lur_time = 0
@@ -1061,6 +1062,9 @@ local function mystery(n)
 		--if true then return end-----
 		local chk
 		for n2=2,4 do
+			if table.find(event_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text]) and event_on then
+				break
+			end
 			if Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.Frame.Bonus.Visible then
 				con_log(cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text],"BONUS:")
 				--ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(v3[3], n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
@@ -1226,7 +1230,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.14",
+    SubTitle = "ver. 2.6.15",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1433,11 +1437,13 @@ do
 			end
 		end
 		if Options.Event2.Value then
-			red_task = table.concat(event_rtask,"|").."|"..table.concat(event_task,"|")
+			event_on = true
+			red_task = table.concat(event_task,"|").."|"..table.concat(event_rtask,"|")
 			red_task = red_task:split("|")
 			street_task = table.concat(event_stask,"|")
 			street_task = street_task:split("|")
 		else
+			event_on = false
 			red_task = table.concat(event_rtask,"|")
 			red_task = red_task:split("|")
 			street_task = table.concat(event_stask,"|").."|"..table.concat(event_task,"|")
@@ -1476,6 +1482,30 @@ do
 				end
 			end
 			Options.Event4:SetValue(false)
+		end
+	end)
+	local Toggle = Tabs.Main:AddToggle("Event5", {Title = "BUY Coconut", Default = false})
+    Toggle:OnChanged(function()
+		if Options.Event5.Value then
+			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
+			if tmp then
+				if tmp >= 145000 then
+					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summerfest_2025_coconut_friend", {["buy_count"]=tmp//145000})
+				end
+			end
+			Options.Event5:SetValue(false)
+		end
+	end)
+	local Toggle = Tabs.Main:AddToggle("Event6", {Title = "BUY Shrimp", Default = false})
+    Toggle:OnChanged(function()
+		if Options.Event6.Value then
+			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
+			if tmp then
+				if tmp >= 38000 then
+					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summer_2025_emperor_shrimp", {["buy_count"]=tmp//38000})
+				end
+			end
+			Options.Event6:SetValue(false)
 		end
 	end)
     
@@ -2794,7 +2824,8 @@ function()
 end)()
 
 wait(5)
-Options.Trans:SetValue(true)
+--Options.Trans:SetValue(true)
+Options.Event2:SetValue(true)
 
 
 --]]
