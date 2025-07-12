@@ -2825,7 +2825,7 @@ end)()
 
 wait(5)
 --Options.Trans:SetValue(true)
-Options.Event2:SetValue(true)
+Options.Event1:SetValue(true)
 
 
 --]]
