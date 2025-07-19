@@ -1000,7 +1000,7 @@ local function red_work(c)
 		if res then
 			local chk
 			local t = os.time()
-			while os.time()-t < 40 and (require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[c] or not chk) do
+			while os.time()-t < 50 and (require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[c] or not chk) do
 				wait(.1)
 				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] and not chk then
 					if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][c] then
@@ -1230,7 +1230,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.15",
+    SubTitle = "ver. 2.6.16",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1244,6 +1244,7 @@ local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "" }),
     Manag = Window:AddTab({ Title = "Manager", Icon = "" }),
     AgeUp = Window:AddTab({ Title = "Age-Up", Icon = "" }),
+	Events = Window:AddTab({ Title = "Events", Icon = "" }),
 	Stat = Window:AddTab({ Title = "Statistics", Icon = "" }),
     --Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
@@ -1450,16 +1451,47 @@ do
 			street_task = street_task:split("|")
 		end
 	end)
-	local Toggle = Tabs.Main:AddToggle("Event1", {Title = "Event Summerfest 2025", Default = false})
+	local Toggle = Tabs.Main:AddToggle("Event1", {Title = "Minigame 1", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event1.Value then
-			Options.Event2:SetValue(true)
+			--Options.Event2:SetValue(true)
 		else
-			Options.Event2:SetValue(false)
+			--Options.Event2:SetValue(false)
 		end
 	end)
 	
-	local Toggle = Tabs.Main:AddToggle("Event3", {Title = "BUY Shark", Default = false})
+	-------------- EVENTS ------------------
+	local t_user
+	pcall(function()
+		t_user = readfile("trade.txt")
+	end)
+	local Input = Tabs.Events:AddInput("trade_usr", {
+		Title = "Trade with:",
+		--Default = manager,
+		--Placeholder = "Placeholder",
+		--Numeric = false,
+		--Finished = false,
+	})
+    Input:OnChanged(function()
+        t_user = Input.Value
+		writefile("trade.txt", t_user)
+    end)
+	Tabs.Events:AddButton({Title = "Send trade", --Description = "",
+        Callback = function()
+			spawn(function()
+				local _,err=pcall(function()
+					if t_user then
+						ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
+					end
+				end)
+				if err then
+					con_log(err, "Trade error:")
+				end
+			end)
+		end
+    })		
+	
+	local Toggle = Tabs.Events:AddToggle("Event3", {Title = "BUY Shark", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event3.Value then
 			--local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025
@@ -1472,7 +1504,7 @@ do
 			Options.Event3:SetValue(false)
 		end
 	end)
-	local Toggle = Tabs.Main:AddToggle("Event4", {Title = "BUY Cripper", Default = false})
+	local Toggle = Tabs.Events:AddToggle("Event4", {Title = "BUY Cripper", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event4.Value then
 			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
@@ -1484,7 +1516,7 @@ do
 			Options.Event4:SetValue(false)
 		end
 	end)
-	local Toggle = Tabs.Main:AddToggle("Event5", {Title = "BUY Coconut", Default = false})
+	local Toggle = Tabs.Events:AddToggle("Event5", {Title = "BUY Coconut", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event5.Value then
 			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
@@ -1496,7 +1528,7 @@ do
 			Options.Event5:SetValue(false)
 		end
 	end)
-	local Toggle = Tabs.Main:AddToggle("Event6", {Title = "BUY Shrimp", Default = false})
+	local Toggle = Tabs.Events:AddToggle("Event6", {Title = "BUY Shrimp", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event6.Value then
 			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
@@ -1508,7 +1540,28 @@ do
 			Options.Event6:SetValue(false)
 		end
 	end)
+	local Toggle = Tabs.Events:AddToggle("Event7", {Title = "BUY Pirates", Default = false})
+    Toggle:OnChanged(function()
+		if Options.Event7.Value then
+			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
+			if tmp then
+				if tmp >= 13000 then
+					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('gifts', "summerfest_2025_kelp_raider_box", {["buy_count"]=tmp//13000})
+					wait(1)
+				end
+			end
+			for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts do
+				if v.id == "summerfest_2025_kelp_raider_box" then
+					ReplicatedStorage.API["LootBoxAPI/ExchangeItemForReward"]:InvokeServer(v.id, i)
+				end
+			end
+			Options.Event7:SetValue(false)
+		end
+	end)
     
+		
+		
+		
 		
 		--------------Manager-----------------
 	
@@ -1970,6 +2023,7 @@ do
 										--con_log("", "boost started")
 										first_start = false
 										Options.Farm:SetValue(false)
+										Options.Event1:SetValue(false)
 									end
 									if n == 11 then
 										break
@@ -2164,7 +2218,7 @@ end
 
 
 local event_flag
-local event_t = 0
+local ev_ev1 = true
 
 coroutine.wrap(
 function()
@@ -2212,12 +2266,32 @@ function()
 				end
 			end
 			--]==]
+			if (os.date("!*t").min) % 10 == 0 then
+				ev_ev1 = true
+			end
+			if ev_ev1 then
+				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
+					if Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
+						ev_ev1 = false
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "1"})
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "2"})
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "3"})
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "4"})
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "5"})
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "6"})
+						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "7"})
+					end
+				end
+			end
 		end)
 		
 		---[===[
 		if Options.Event1.Value and not busy then
 		
-			if (os.date("!*t").min-1) % 10 == 0 or ((os.date("!*t").min-2) % 10 == 0 and os.date("!*t").sec <= 40) then
+			--if (os.date("!*t").min-1) % 10 == 0 or ((os.date("!*t").min-2) % 10 == 0 and os.date("!*t").sec <= 40) then
+			if os.date("!*t").min == 11 or (os.date("!*t").min == 12 and os.date("!*t").sec <= 40) or
+			os.date("!*t").min == 31 or (os.date("!*t").min == 32 and os.date("!*t").sec <= 40) or
+			os.date("!*t").min == 51 or (os.date("!*t").min == 52 and os.date("!*t").sec <= 40) then
 				local _,err=pcall(function()
 					event_flag = true
 					busy = true
@@ -2255,8 +2329,10 @@ function()
 								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-11977, 9899, 8989)
 							elseif Player.Character.HumanoidRootPart.Position.X < -6500 then
 								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-8977, 9899, 8989)
-							else
+							elseif Player.Character.HumanoidRootPart.Position.X < -3500 then
 								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-5977, 9899, 8989)
+							else
+								Player.Character.HumanoidRootPart.CFrame = CFrame.new(-2977, 9899, 8989)
 							end
 						end
 						Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
@@ -2826,6 +2902,7 @@ end)()
 wait(5)
 --Options.Trans:SetValue(true)
 Options.Event1:SetValue(true)
+Options.Event2:SetValue(true)
 
 
 --]]
