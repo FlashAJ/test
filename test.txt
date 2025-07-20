@@ -2231,8 +2231,10 @@ function()
 		wait(.05)
 		pcall(function()
 			if (os.date("!*t").min) % 10 == 0 and os.time() - ev_ev1_t > 60 then
+				if not ev_ev1 then
+					con_log("","ёбонь1")
+				end
 				ev_ev1 = true
-				con_log("","ёбонь1")
 			end
 			if ev_ev1 then
 				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
