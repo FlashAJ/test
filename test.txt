@@ -2226,16 +2226,21 @@ function()
 	local count = 0
 	local work_time = 0
 	local work_point = os.time()
+	local ev_ev1_t = 0
 	while not Fluent.Unloaded do
 		wait(.05)
 		pcall(function()
-			if (os.date("!*t").min) % 10 == 0 then
+			if (os.date("!*t").min) % 10 == 0 and os.time() - ev_ev1_t > 60 then
 				ev_ev1 = true
+				con_log("","ёбонь1")
 			end
 			if ev_ev1 then
 				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
 					if Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
+						wait(2)
+						con_log("","ёбонь2")
 						ev_ev1 = false
+						ev_ev1_t = os.time()
 						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "1"})
 						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "2"})
 						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "3"})
@@ -2476,6 +2481,9 @@ function()
 							if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID]["summerfest_bonfire"] then
 								--con_log("","TP1")----
 								Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+								if ev_ev1 then
+									wait(3)
+								end
 								GoToHome()
 								wait(2)
 								Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(-7, 100, 3))
@@ -2484,6 +2492,9 @@ function()
 						else
 							--con_log("","TP2")----
 							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+							if ev_ev1 then
+								wait(3)
+							end
 							GoToHome()
 							wait(2)
 							Player.Character.HumanoidRootPart.CFrame = Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA('Model'):GetModelCFrame():ToWorldSpace(CFrame.new(-7, 100, 3))
