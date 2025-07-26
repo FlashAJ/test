@@ -2249,7 +2249,7 @@ function()
 			if ev_ev1 then
 				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
 					if Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
-						wait(2)
+						wait(4)
 							--con_log( Workspace.Interiors:FindFirstChild("Summer2025_Shop",true):FindFirstChild("Countdown",true).Text )
 							--con_log( Workspace.Interiors:FindFirstChild("Summer2025_Shop",true).KeyKiosk.TideCountdown:FindFirstChild("Countdown",true).Text )
 							--con_log( Workspace.Interiors:FindFirstChild("Summer2025_Shop",true).KeyKiosk.TideCountdown.Sign.SurfaceGui.Countdown.Text )
@@ -2295,20 +2295,21 @@ function()
 						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "6"})
 						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "7"})
 						local jewel = {}
-						local shrimp
+						local n = 1
 						for _,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.toys do
 							if v.id == "summerfest_2025_priceless_jewel" then
-								table.insert(jewel, v.unique)
+								n = n + 1
+								jewel["r_"..tostring(n)] = v.unique
 							end
-							if #jewel == 5 then
+							if n == 6 then
 								ev_ev_2 = true
 								for _,vv in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
 									if vv.id == "summer_2025_emperor_shrimp" then
-										shrimp = vv.unique
+										jewel["r_1"] = vv.unique
 										break
 									end
 								end
-								if not shrimp then
+								if not jewel["r_1"] then
 									local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
 									if tmp then
 										if tmp >= 38000 then
@@ -2317,7 +2318,7 @@ function()
 									end
 									for _,vv in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
 										if vv.id == "summer_2025_emperor_shrimp" then
-											shrimp = vv.unique
+											jewel["r_1"] = vv.unique
 											break
 										end
 									end
@@ -2325,17 +2326,12 @@ function()
 								break
 							end
 						end
-						if #jewel == 5 and shrimp then
-							--table.insert(jewel, shrimp)
-							--local jewel1 = {}
-							--for i,v in jewel do
-								--jewel1["r_"..tostring(i)] = v
-							--end
+						if jewel["r_1"] then
 							--local fur = Furniture({"summer_2025_priceless_shrimp"}) --"f-41"
-							--local res = ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(Furniture({"summer_2025_priceless_shrimp"}), "UseBlock", jewel1, Player.Character)
-							--con_log(res, #jewel)
-							--wait(2)
-							--ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+							local res = ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(Furniture({"summer_2025_priceless_shrimp"}), "UseBlock", jewel, Player.Character)
+							con_log(res, n)----
+							wait(1)
+							ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
 						end
 						ev_ev1 = false
 						ev_ev_t1 = os.time()
@@ -2578,7 +2574,7 @@ function()
 								--con_log("","TP1")----
 								Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 								if ev_ev1 then
-									wait(5)
+									wait(10)
 								end
 								if ev_ev_2 then
 									wait(5)
@@ -2592,7 +2588,7 @@ function()
 							--con_log("","TP2")----
 							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 							if ev_ev1 then
-								wait(5)
+								wait(10)
 							end
 							if ev_ev_2 then
 								wait(5)
