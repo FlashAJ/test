@@ -2314,6 +2314,8 @@ function()
 									if tmp then
 										if tmp >= 38000 then
 											ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summer_2025_emperor_shrimp", {["buy_count"]=1})
+											wait(1)
+											ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
 										end
 									end
 									for _,vv in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
