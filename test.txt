@@ -1231,7 +1231,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.17",
+    SubTitle = "ver. 2.6.18",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1557,6 +1557,18 @@ do
 				end
 			end
 			Options.Event7:SetValue(false)
+		end
+	end)
+	local Toggle = Tabs.Events:AddToggle("Event8", {Title = "BUY Tarsier", Default = false})
+    Toggle:OnChanged(function()
+		if Options.Event8.Value then
+			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
+			if tmp then
+				if tmp >= 3400 then
+					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summerfest_2025_island_tarsier", {["buy_count"]=tmp//3400})
+				end
+			end
+			Options.Event8:SetValue(false)
 		end
 	end)
     
@@ -2329,6 +2341,7 @@ function()
 							end
 						end
 						if jewel["r_1"] then
+							wait(10)
 							--local fur = Furniture({"summer_2025_priceless_shrimp"}) --"f-41"
 							local res = ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(Furniture({"summer_2025_priceless_shrimp"}), "UseBlock", jewel, Player.Character)
 							con_log(res, n)----
