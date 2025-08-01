@@ -1,4 +1,3 @@
-
 --loadstring(game:HttpGet("http://192.168.1.217:55256/script.lua"))()
 
 function con_log(txt, header)
@@ -3026,9 +3025,9 @@ function()
 end)()
 
 wait(5)
-Options.Event1:SetValue(true)
-Options.Event2:SetValue(true)
---Options.Trans:SetValue(true)
+--Options.Event1:SetValue(true)
+--Options.Event2:SetValue(true)
+Options.Trans:SetValue(true)
 
 
 --]]
