@@ -30,7 +30,7 @@ local Beds = {
     "BasicCrib",
     "RoyalCrib",
     "PoshCrib",
-    "BasicBed",
+    --"BasicBed",
 }
 local lures_bait = {
 	"lures_2023_campfire_cookies",
