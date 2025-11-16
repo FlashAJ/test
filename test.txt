@@ -1,42 +1,8 @@
 --loadstring(game:HttpGet("http://192.168.1.217:55256/script.lua"))()
 
-function con_log(txt, header)
-	if not header then
-		header = "information:"
-	end
-  game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = tostring(header);
-    Text = tostring(txt);
-    Duration = 5
-  })
-end
-con_log("","start loading...")
+repeat wait(.3) until game:IsLoaded()
 
 
-if #game:GetService("Players"):GetChildren() > 1 then
-else
-	con_log("","waiting ready server...")
-	for i=1,10 do
-		if isfolder("DeltaAssets") then
-			if game:GetService("Players").LocalPlayer.PlayerGui.NewsApp.Enabled then
-				break
-			end
-		end
-		wait(1)
-	end
-end
-
---[[
-local lighting = game:GetService("Lighting")
--- Установите яркость на 0
-lighting.Brightness = 0
--- Отключите различные эффекты освещения
-lighting.Ambient = Color3.new(0, 0, 0) -- Установите окружающий свет на черный
-lighting.OutdoorAmbient = Color3.new(0, 0, 0) -- Установите наружный свет на черный
-lighting.FogColor = Color3.new(0, 0, 0) -- Установите цвет тумана на черный
-lighting.FogEnd = 0 -- Установите конец тумана на 0
-lighting.FogStart = 0
---]]
 
 local ScWare = true
 
@@ -64,6 +30,7 @@ local Beds = {
     "BasicCrib",
     "RoyalCrib",
     "PoshCrib",
+    "BasicBed",
 }
 local lures_bait = {
 	"lures_2023_campfire_cookies",
@@ -262,6 +229,37 @@ if is_manager then
 end
 
 
+
+--[[
+local lighting = game:GetService("Lighting")
+-- Установите яркость на 0
+lighting.Brightness = 0
+-- Отключите различные эффекты освещения
+lighting.Ambient = Color3.new(0, 0, 0) -- Установите окружающий свет на черный
+lighting.OutdoorAmbient = Color3.new(0, 0, 0) -- Установите наружный свет на черный
+lighting.FogColor = Color3.new(0, 0, 0) -- Установите цвет тумана на черный
+lighting.FogEnd = 0 -- Установите конец тумана на 0
+lighting.FogStart = 0
+--]]
+
+
+function con_log(txt, header)
+	if not header then
+		header = "information:"
+	end
+  game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = tostring(header);
+    Text = tostring(txt);
+    Duration = 5
+  })
+end
+con_log("","start loading...")
+
+
+
+repeat wait() until game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("PlayButton",true)
+
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local VirtualUser = game:GetService("VirtualUser")
@@ -276,47 +274,28 @@ local _,err=pcall(function()
 	for i, v in pairs(getupvalue(require(ReplicatedStorage.Fsys).load("RouterClient").init, 7)) do
 		v.Name = i
 	end
-end)if err then con_log("reconnect to the game!", "BAD INJECTION!")end
+end)if err then con_log(err, "BAD INJECTION!")end
 
 
-local _,err=pcall(function()
-set_thread_identity(2)
---require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("MainMenuApp", false)
-require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("NewsApp", false)
-set_thread_identity(7)
-end)
-if err then
-con_log(err)
-end
 
-local _,err=pcall(function()
-	_=Workspace.Pstone
-end)
-if err then
-	local n=0
-	while not Player.PlayerGui.DailyLoginApp.Frame.Visible and n < 10 do
-		wait(1)
-		n=n+1
+if not Player.Character then
+	while not Player.PlayerGui.NewsApp.Enabled do
+		wait()
 	end
 	local _,err=pcall(function()
-		if Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.Face.TextLabel.Text ~= "CLOSE" then
-			--ReplicatedStorage.API:FindFirstChild("DailyLoginAPI/ClaimDailyReward"):InvokeServer()
-			getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Down)[1]:Fire()
-			getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Up)[1]:Fire()
-			getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Click)[1].Function()
-		end
-		getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Down)[1]:Fire()
-		getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Up)[1]:Fire()
-		getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Click)[1].Function()
+	set_thread_identity(2)
+	--require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("MainMenuApp", false)
+	require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("NewsApp", false)
+	set_thread_identity(7)
 	end)
 	if err then
-		pcall(function()
-		set_thread_identity(2)
-		require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DailyLoginApp", false)
-		set_thread_identity(7)
-		end)
+	con_log(err)
+	end
+	while not Player.Character do
+		wait()
 	end
 end
+
 
 
 local t = {}
@@ -343,9 +322,6 @@ function tmp_chk(data)
 end
 
 loadstring(tmp_chk(str))()
-
-
-
 
 
 local Part
@@ -392,8 +368,6 @@ if err and exper then
 	--Player.PlayerGui.indicator.Container.Amount.TextSize = 23
 	--Player.PlayerGui.indicator.Container.Amount.TextColor3 = Color3.new(43/255, 172/255, 73/255)
 end
-
---
 
 
 
@@ -1149,8 +1123,8 @@ local function Pets()
 				end
 			elseif n.id:find("minigame") then
 			else
-				local t1 = n.properties.ailments_completed
-				if t1 < 10 then
+				local t1 = n.properties.xp
+				if t1 < 1000 then
 					t1 = "0"..tostring(t1)
 				else
 					t1 = tostring(t1)
@@ -1231,7 +1205,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.18",
+    SubTitle = "ver. 2.6.19",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1260,7 +1234,7 @@ do
     --    Duration = 10 -- Set to nil to make the notification not disappear
     --})
         
-    local Toggle = Tabs.Main:AddToggle("Farm", {Title = "Farm", Default = true})
+    local Toggle = Tabs.Main:AddToggle("Farm", {Title = "Farm", Default = false})
     Toggle:OnChanged(function()
 		if Options.Farm.Value and exper then
 			con_log("", "Farm started")
@@ -1278,7 +1252,14 @@ do
 					break
 				end
 			end
+			
+			local _,err=pcall(function()
 			Pets()
+			end)
+			if err then
+			con_log(err)
+			end
+			
 			bed = Furniture(Beds)
 			wash = Furniture(Washings)
 			toil = Furniture({"Toilet"})
@@ -1633,7 +1614,7 @@ do
 									n = n + 1
 								end
 							end
-							res = game:HttpGet("http://"..manager.."/ready&"..Player.Name.."="..tostring(bal).."&Potion="..tostring(n))
+							local res = game:HttpGet("http://"..manager.."/ready&"..Player.Name.."="..tostring(bal).."&Potion="..tostring(n))
 							local tmp = string.split(res, ":")
 							users = {}
 							if res ~= "" then
@@ -2050,7 +2031,7 @@ do
 							
 							if check_pition then								
 								local t=os.time()
-								local before = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed
+								local before = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.xp
 								--ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject",true):InvokeServer("__Enum_PetObjectCreatorType_2",{["unique_id"] = Potion.unique,["possible_grabber_pet_unique"] = uniq,["pet_unique"] = uniq,["grab_immediately"] = false})
 								ReplicatedStorage:FindFirstChild("PetObjectAPI/CreatePetObject",true):InvokeServer("__Enum_PetObjectCreatorType_2", {
 								["additional_consume_uniques"] = {unpack(potns)},
@@ -2073,7 +2054,7 @@ do
 									--end
 								--end
 								
-								while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.ailments_completed == before and os.time()-t < 15 and
+								while require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.xp == before and os.time()-t < 15 and
 								require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[uniq].properties.age ~= 6 do
 									wait()
 								end
@@ -2355,6 +2336,29 @@ function()
 				end
 			end
 			
+			
+			if Player.PlayerGui.DailyLoginApp.Frame.Visible then
+				local _,err=pcall(function()
+					if Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.Face.TextLabel.Text ~= "CLOSE" then
+						getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Down)[1]:Fire()
+						getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Up)[1]:Fire()
+						ReplicatedStorage.API:FindFirstChild("DailyLoginAPI/ClaimDailyReward"):InvokeServer()
+						getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Click)[1].Function()
+						wait(.3)
+					end
+					getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Down)[1]:Fire()
+					getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Up)[1]:Fire()
+					getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Click)[1].Function()
+				end)
+				if err then
+					con_log(err, "error daily rewards")
+					pcall(function()
+					set_thread_identity(2)
+					require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DailyLoginApp", false)
+					set_thread_identity(7)
+					end)
+				end			
+			end
 			
 			if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
 				if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.Text:find("!") then
@@ -3025,6 +3029,8 @@ function()
 end)()
 
 wait(5)
+Options.Farm:SetValue(true)
+wait(1)
 --Options.Event1:SetValue(true)
 --Options.Event2:SetValue(true)
 Options.Trans:SetValue(true)
@@ -3032,6 +3038,16 @@ Options.Trans:SetValue(true)
 
 --]]
 --con_log("done")
+
+
+
+
+
+
+
+
+
+
 
 
 
