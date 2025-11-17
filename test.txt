@@ -2341,6 +2341,7 @@ function()
 				local _,err=pcall(function()
 					if Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.Face.TextLabel.Text ~= "CLOSE" then
 						getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Down)[1]:Fire()
+						wait(.1)
 						getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Up)[1]:Fire()
 						ReplicatedStorage.API:FindFirstChild("DailyLoginAPI/ClaimDailyReward"):InvokeServer()
 						getconnections(Player.PlayerGui.DailyLoginApp.Frame.Body.Buttons.ClaimButton.MouseButton1Click)[1].Function()
@@ -2355,6 +2356,22 @@ function()
 					pcall(function()
 					set_thread_identity(2)
 					require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DailyLoginApp", false)
+					set_thread_identity(7)
+					end)
+				end			
+			end
+			if Player.PlayerGui.PlaytimePayoutsApp.Enabled then
+				local _,err=pcall(function()
+					getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DepthButton",true).MouseButton1Down)[1]:Fire()
+					--game:GetService("ReplicatedStorage").API:FindFirstChild("PayAPI/Collect"):FireServer()
+					wait(.3)
+					getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DepthButton",true).MouseButton1Up)[1]:Fire()
+					getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DepthButton",true).MouseButton1Click)[1].Function()
+				end)
+				if err then
+					pcall(function()
+					set_thread_identity(2)
+					require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("PlaytimePayoutsApp", false)
 					set_thread_identity(7)
 					end)
 				end			
