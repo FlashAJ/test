@@ -1205,7 +1205,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.19",
+    SubTitle = "ver. 2.6.20",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2362,6 +2362,10 @@ function()
 			end
 			if Player.PlayerGui.PlaytimePayoutsApp.Enabled then
 				local _,err=pcall(function()
+					local _,err=pcall(function()
+						getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DontShow",true).Activated)[1]:Fire()
+						wait(.1)
+					end)
 					getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DepthButton",true).MouseButton1Down)[1]:Fire()
 					--game:GetService("ReplicatedStorage").API:FindFirstChild("PayAPI/Collect"):FireServer()
 					wait(.3)
