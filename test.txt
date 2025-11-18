@@ -7,6 +7,45 @@ repeat wait(.3) until game:IsLoaded()
 local ScWare = true
 
 
+
+local worked_pets = {
+	"basic_egg_2022_ant",
+	"basic_egg_2022_mouse",
+	"basic_egg_2022_poodle",
+	"basic_egg_2022_zebra",
+	"basic_egg_2022_robot",
+	"basic_egg_2022_donkey",
+	"basic_egg_2022_camel",
+	"basic_egg_2022_corgi",
+	"basic_egg_2022_parakeet",
+	"basic_egg_2022_swordfish",
+	"basic_egg_2022_orangutan",
+	"basic_egg_2022_ancient_dragon",
+	"basic_egg_2022_alicorn",
+	"basic_egg_2022_dragonfly",
+	"buffalo",
+	"cat",
+	"dog",
+	"otter",
+	"chocolate_labrador",
+	"fennec",
+	"puma",
+	"snow_cat",
+	"beaver",
+	"bunny",
+	"rabbit",
+	"snow_puma",
+	"red_panda",
+	"shiba",
+	"unicorn",
+	"dragon",
+	"ice_dimension_2025_icy_porcupine",
+	"ice_dimension_2025_chilly_penguin",
+	"ice_dimension_2025_snowy_mammoth",
+}
+
+
+
 local bowls_f = {
 	"PetFoodBbowl",
 }
@@ -171,6 +210,7 @@ local mystery_task = {
 	"play",
 	"walk",
 	"ride",
+	"pet_me",
 	--"bored",
     --"beach_party",
     --"camping",
@@ -987,6 +1027,7 @@ local function red_work(c)
 			ReplicatedStorage.API["AdoptAPI/ExitSeatStates"]:FireServer()
 		end
 	end
+	wait(2)
 end
 
 
@@ -1152,7 +1193,7 @@ local function Pets()
 			--wait(2)--
 			--if items[ v[2] ]["properties"]["age"] ~= 6 then
 			PetID = tmp
-			if items[ v[2] ]["properties"]["age"] ~= 6 and not endswith(items[ v[2] ]["id"], "_egg") then
+			if items[ v[2] ]["properties"]["age"] ~= 6 and not endswith(items[ v[2] ]["id"], "_egg") and table.find(worked_pets, items[ v[2] ]["id"]) then
 				PetID = items[ v[2] ]["unique"]
 				break
 			end
@@ -1205,7 +1246,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.6.20",
+    SubTitle = "ver. 2.7.0",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1839,6 +1880,7 @@ do
 										end
 										wait(1)
 									end
+									--[[
 									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" and
 									require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture then
 										--if not busy then
@@ -1862,6 +1904,7 @@ do
 											busy = false
 										--end
 									end
+									--]]
 								end
 							end)
 							if err then
@@ -2221,120 +2264,11 @@ function()
 	local count = 0
 	local work_time = 0
 	local work_point = os.time()
-	local ev_ev_t1 = 0
-	local ev_ev2_t
+	
+	
 	while not Fluent.Unloaded do
 		wait(.05)
 		pcall(function()
-			
-			if (os.date("!*t").min) % 10 == 0 and os.time() - ev_ev_t1 > 60 then
-				if not ev_ev1 then
-					con_log("","время собирать ништяки")
-				end
-				ev_ev1 = true
-			end
-			----
-			if ev_ev2_t and os.date("!*t").hour == 15 then
-				--con_log("","время собирать ништяки")
-				ev_ev2_t = 0
-			end
-			----
-			if ev_ev1 then
-				if Workspace.Interiors:FindFirstChildWhichIsA("Model") then
-					if Workspace.Interiors:FindFirstChildWhichIsA("Model").Name:find("MainMap") then
-						wait(4)
-							--con_log( Workspace.Interiors:FindFirstChild("Summer2025_Shop",true):FindFirstChild("Countdown",true).Text )
-							--con_log( Workspace.Interiors:FindFirstChild("Summer2025_Shop",true).KeyKiosk.TideCountdown:FindFirstChild("Countdown",true).Text )
-							--con_log( Workspace.Interiors:FindFirstChild("Summer2025_Shop",true).KeyKiosk.TideCountdown.Sign.SurfaceGui.Countdown.Text )
-						if table.find({15,16,19,20,23,0,3,4,7,8,11,12}, os.date("!*t").hour) then
-							if not ev_ev2_t or os.time() - ev_ev2_t > 86400 then
-								local n = 0
-								for i,v in Workspace.Interiors:FindFirstChild("LootboxDisplays",true):GetDescendants() do
-									if v.Name == "Claimed" then
-										if v.Visible then
-											n = n + 1
-										end
-									end
-								end
-								if n < 18 then
-									ev_ev_2 = true
-									con_log("СУНДУКИ","собираю ништяки 1")
-									for i=1,17 do
-										ReplicatedStorage.API["SummerfestEventAPI/RequestBuyTreasureKey"]:InvokeServer()
-										ReplicatedStorage.API["SummerfestEventAPI/RequestOpenTideChest"]:InvokeServer(i)
-									end
-									ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "7"})
-									ReplicatedStorage.API["SummerfestEventAPI/RequestOpenTideChest"]:InvokeServer(18)
-									n = 0
-									for i,v in Workspace.Interiors:FindFirstChild("LootboxDisplays",true):GetDescendants() do
-										if v.Name == "Claimed" then
-											if v.Visible then
-												n = n + 1
-											end
-										end
-									end
-								end
-								if n >= 18 then
-									ev_ev2_t = os.time()
-								end
-							end
-						end
-						con_log("ШАРЫ","собираю ништяки 2")
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "1"})
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "2"})
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "3"})
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "4"})
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "5"})
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "6"})
-						ReplicatedStorage.API["SummerfestEventAPI/CrowsNestHit"]:FireServer({["cannon_key"] = "7"})
-						local jewel = {}
-						local n = 1
-						for _,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.toys do
-							if v.id == "summerfest_2025_priceless_jewel" then
-								n = n + 1
-								jewel["r_"..tostring(n)] = v.unique
-							end
-							if n == 6 then
-								ev_ev_2 = true
-								for _,vv in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-									if vv.id == "summer_2025_emperor_shrimp" then
-										jewel["r_1"] = vv.unique
-										break
-									end
-								end
-								if not jewel["r_1"] then
-									local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
-									if tmp then
-										if tmp >= 38000 then
-											ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summer_2025_emperor_shrimp", {["buy_count"]=1})
-											wait(1)
-											ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
-										end
-									end
-									for _,vv in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-										if vv.id == "summer_2025_emperor_shrimp" then
-											jewel["r_1"] = vv.unique
-											break
-										end
-									end
-								end
-								break
-							end
-						end
-						if jewel["r_1"] then
-							wait(10)
-							--local fur = Furniture({"summer_2025_priceless_shrimp"}) --"f-41"
-							local res = ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(Furniture({"summer_2025_priceless_shrimp"}), "UseBlock", jewel, Player.Character)
-							con_log(res, n)----
-							wait(1)
-							ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
-						end
-						ev_ev1 = false
-						ev_ev_t1 = os.time()
-						ev_ev_2 = false
-					end
-				end
-			end
 			
 			
 			if Player.PlayerGui.DailyLoginApp.Frame.Visible then
@@ -2420,7 +2354,7 @@ function()
 			--]==]
 		end)
 		
-		---[===[
+		--[===[
 		if Options.Event1.Value and not busy then
 		
 			--if (os.date("!*t").min-1) % 10 == 0 or ((os.date("!*t").min-2) % 10 == 0 and os.date("!*t").sec <= 40) then
@@ -2606,7 +2540,9 @@ function()
 					ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(tmpID)
 					PetID = tmpID
 				end
+				
 				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "MainMap" then
+					--[[
 					if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments["summerfest_bonfire"] then
 						--con_log(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID])----
 						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
@@ -2639,8 +2575,58 @@ function()
 							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 						end
 					end
+					--]]
 				end
 				
+				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" and
+				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture then
+					--if not busy then
+						busy = true
+						wait(15)
+						local _,err=pcall(function()
+							con_log("babyfarm")----
+							ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
+							local n = 0
+							while n < 20 do
+								wait(1)
+								n = n + 1
+								if Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model") and Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model").Name == Player.Name then
+									break
+								end
+							end
+							wait(2)
+							Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+						end)
+						--busy = false
+					--end
+				end
+				
+				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.age == 6 then
+					local chk_work_ailm
+					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] or {} do
+						if i:find("mystery") or table.find(red_task, i) or table.find(wend_task, i) or table.find(care_task, i) then
+							chk_work_ailm = true
+						end
+					end
+					if not chk_work_ailm then
+						chk_work_ailm = true
+						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+							if v.id == "practice_dog" or v.id:find("minigame") or endswith(v.id, "_egg") then
+							else
+								if v.properties.age < 6 and table.find(worked_pets, v.id) then
+									chk_work_ailm = false
+								end
+							end
+						end
+					end
+					if not chk_work_ailm then
+						ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+						wait(1)
+						PetID = nil
+						Pets()
+					end
+				end
 				
 				---------------------------------
 				-- get food
@@ -2716,6 +2702,7 @@ function()
 						spawn(function()
 							done,_=pcall(function()
 								work[v_b](true)
+								wait(1)
 							end)
 						end)
 						
@@ -2724,6 +2711,7 @@ function()
 								for _,v in eat_task do
 									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[v] then
 										work[v](true)
+										wait(1)
 									end
 								end
 							end)
@@ -2735,6 +2723,7 @@ function()
 									else
 										if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v] then
 											work[v](false)
+											wait(1)
 										end
 									end
 								end
@@ -2756,6 +2745,7 @@ function()
 						for _,v in eat_task do
 							if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[v] then
 								work[v](true)
+								wait(1)
 							end
 						end
 					end)
@@ -2769,6 +2759,7 @@ function()
 						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
 							if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v] then
 								work[v](false)
+								wait(1)
 								chk = true
 								if done2 ~= nil then
 									break
@@ -2786,6 +2777,7 @@ function()
 							if done2 ~= nil then
 								if not event_flag then
 									work[v]()
+									wait(1)
 								end
 								if v ~= "pet_me" then
 									break
@@ -2793,6 +2785,7 @@ function()
 							elseif v == "walk" and not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v].components.preference then
 								if not event_flag then
 									work[v]()
+									wait(1)
 								end
 								break
 							--elseif v == "ride" and require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v].components.preference then
