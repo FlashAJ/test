@@ -6,6 +6,7 @@ repeat wait(.3) until game:IsLoaded()
 
 local ScWare = true
 
+local t_user = "METADPS"
 
 local eggs = {
     "cracked_egg",
@@ -51,6 +52,13 @@ local worked_pets = {
 	"ice_dimension_2025_snowy_mammoth",
 }
 
+local legendary_pets = {
+	"basic_egg_2022_ancient_dragon",
+	"basic_egg_2022_alicorn",
+	"basic_egg_2022_dragonfly",
+	"unicorn",
+	"dragon",
+}
 
 
 local bowls_f = {
@@ -1253,7 +1261,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.7.1",
+    SubTitle = "ver. 2.7.2",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1479,36 +1487,7 @@ do
 	
 	
 	-------------- EVENTS ------------------
-	local t_user
-	pcall(function()
-		t_user = readfile("trade.txt")
-	end)
-	local Input = Tabs.Events:AddInput("trade_usr", {
-		Title = "Trade with:",
-		--Default = manager,
-		--Placeholder = "Placeholder",
-		--Numeric = false,
-		--Finished = false,
-	})
-    Input:OnChanged(function()
-        t_user = Input.Value
-		writefile("trade.txt", t_user)
-    end)
-	Tabs.Events:AddButton({Title = "Send trade", --Description = "",
-        Callback = function()
-			spawn(function()
-				local _,err=pcall(function()
-					if t_user then
-						ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
-					end
-				end)
-				if err then
-					con_log(err, "Trade error:")
-				end
-			end)
-		end
-    })		
-	
+	--[[
 	local Toggle = Tabs.Events:AddToggle("Event3", {Title = "BUY Shark", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event3.Value then
@@ -1522,72 +1501,7 @@ do
 			Options.Event3:SetValue(false)
 		end
 	end)
-	local Toggle = Tabs.Events:AddToggle("Event4", {Title = "BUY Cripper", Default = false})
-    Toggle:OnChanged(function()
-		if Options.Event4.Value then
-			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
-			if tmp then
-				if tmp >= 79000 then
-					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summerfest_2025_seabed_creeper", {["buy_count"]=tmp//79000})
-				end
-			end
-			Options.Event4:SetValue(false)
-		end
-	end)
-	local Toggle = Tabs.Events:AddToggle("Event5", {Title = "BUY Coconut", Default = false})
-    Toggle:OnChanged(function()
-		if Options.Event5.Value then
-			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
-			if tmp then
-				if tmp >= 145000 then
-					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summerfest_2025_coconut_friend", {["buy_count"]=tmp//145000})
-				end
-			end
-			Options.Event5:SetValue(false)
-		end
-	end)
-	local Toggle = Tabs.Events:AddToggle("Event6", {Title = "BUY Shrimp", Default = false})
-    Toggle:OnChanged(function()
-		if Options.Event6.Value then
-			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
-			if tmp then
-				if tmp >= 38000 then
-					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summer_2025_emperor_shrimp", {["buy_count"]=tmp//38000})
-				end
-			end
-			Options.Event6:SetValue(false)
-		end
-	end)
-	local Toggle = Tabs.Events:AddToggle("Event7", {Title = "BUY Pirates", Default = false})
-    Toggle:OnChanged(function()
-		if Options.Event7.Value then
-			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
-			if tmp then
-				if tmp >= 13000 then
-					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('gifts', "summerfest_2025_kelp_raider_box", {["buy_count"]=tmp//13000})
-					wait(1)
-				end
-			end
-			for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts do
-				if v.id == "summerfest_2025_kelp_raider_box" then
-					ReplicatedStorage.API["LootBoxAPI/ExchangeItemForReward"]:InvokeServer(v.id, i)
-				end
-			end
-			Options.Event7:SetValue(false)
-		end
-	end)
-	local Toggle = Tabs.Events:AddToggle("Event8", {Title = "BUY Tarsier", Default = false})
-    Toggle:OnChanged(function()
-		if Options.Event8.Value then
-			local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].cranky_coins_2025
-			if tmp then
-				if tmp >= 3400 then
-					ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer('pets', "summerfest_2025_island_tarsier", {["buy_count"]=tmp//3400})
-				end
-			end
-			Options.Event8:SetValue(false)
-		end
-	end)
+	--]]
     
 		
 		
@@ -1928,6 +1842,38 @@ do
 			end
 		end
     end)
+	
+	pcall(function()
+		local tmp = readfile("trade.txt")
+		if tmp ~= "" then
+			t_user = tmp
+		end
+	end)
+	local Input = Tabs.Manag:AddInput("trade_usr", {
+		Title = "Trade with:",
+		Default = t_user,
+		--Placeholder = "Placeholder",
+		--Numeric = false,
+		--Finished = false,
+	})
+    Input:OnChanged(function()
+        t_user = Input.Value
+		writefile("trade.txt", t_user)
+    end)
+	Tabs.Manag:AddButton({Title = "Send trade", --Description = "",
+        Callback = function()
+			spawn(function()
+				local _,err=pcall(function()
+					if t_user then
+						ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
+					end
+				end)
+				if err then
+					con_log(err, "Trade error:")
+				end
+			end)
+		end
+    })		
 
 
 		--------------AgeUp-------------------
@@ -2641,6 +2587,77 @@ function()
 						Pets()
 					end
 				end
+				
+				if Options.hatch_egg.Value then
+					local _,err=pcall(function()
+						local Pts = {}
+						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+							if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
+								if not Pts[v.id] then
+									Pts[v.id] = {}
+								end
+								table.insert(Pts[v.id], v.unique)
+							end
+						end
+						for i, v in Pts do
+							if #v < 4 then
+							else
+								local Spec={}
+								for n=1, #v//4 do
+									local tmp = (n-1)*4
+									local res = ReplicatedStorage.API["PetAPI/DoNeonFusion"]:InvokeServer({v[tmp+1], v[tmp+2], v[tmp+3], v[tmp+4]})
+									if res then
+										con_log(i, "Create mega-neon:")
+									end
+								end
+							end
+						end
+					end)if err then con_log(err, "Error make Neon:")end
+					local _,err=pcall(function()
+						local Pts = {}
+						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+							--if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
+							if v.properties.age == 6 and not v.properties.neon and not v.properties.mega_neon and v.properties.friendship_level < 300 then
+								if not Pts[v.id] then
+									Pts[v.id] = {}
+								end
+								table.insert(Pts[v.id], v.unique)
+							end
+						end
+						for i, v in Pts do
+							if #v < 4 then
+							else
+								local Spec={}
+								for n=1, #v//4 do
+									local tmp = (n-1)*4
+									local res = ReplicatedStorage.API["PetAPI/DoNeonFusion"]:InvokeServer({v[tmp+1], v[tmp+2], v[tmp+3], v[tmp+4]})
+									if res then
+										con_log(i, "Create neon:")
+									end
+								end
+							end
+						end
+					end)if err then con_log(err, "Error make Neon:")end
+				end
+				
+				
+				if t_user ~= "" then
+					if Players:FindFirstChild(t_user) then
+						if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+								if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 350 then
+								elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
+								elseif v.properties.age == 6 and not table.find(legendary_pets, v.id) then
+									if Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
+									else
+										ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[t_user], v.unique)
+									end
+								end
+							end
+						end
+					end
+				end
+				
 				
 				---------------------------------
 				-- get food
