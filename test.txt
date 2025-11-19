@@ -1453,11 +1453,11 @@ do
 		end
 	end)
     
-	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Egg:", Default = false})
+	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Eggs", Default = false})
     Toggle:OnChanged(function()
 	end)
 	local Dropdown = Tabs.Main:AddDropdown("eggs", {
-		Title = "choice egg for hatch",
+		Title = "egg to hatch:",
 		Values = eggs,
 		Multi = false,
 		Default = 1,
