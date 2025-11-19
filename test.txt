@@ -1216,9 +1216,9 @@ local function Pets()
 		if not PetID then
 			PetID = tmp
 		end
-		--if not items[PetID] then
-			--PetID = tmp
-		--end
+		if not items[PetID] then	--for particle dog, if no one pets
+			PetID = tmp
+		end
 	end
 	
 	ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
@@ -2546,7 +2546,8 @@ function()
 					--end
 				end
 				
-				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.age == 6 then
+				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.age == 6 or 
+				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].id == "practice_dog" then
 					local chk_work_ailm
 					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] or {} do
 						if i:find("mystery") or table.find(red_task, i) or table.find(wend_task, i) or table.find(care_task, i) then
