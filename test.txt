@@ -7,6 +7,13 @@ repeat wait(.3) until game:IsLoaded()
 local ScWare = true
 
 
+local eggs = {
+    "cracked_egg",
+    "regular_pet_egg",
+    "royal_egg",
+    "retired_egg",
+}
+
 
 local worked_pets = {
 	"basic_egg_2022_ant",
@@ -1227,8 +1234,8 @@ local kassa = {}
 local Ps = {}
 local PetsList = {}
 local make_neon = false
-local event_rtask
-local event_stask
+
+
 
 local Fluent
 local _,err=pcall(function()
@@ -1246,7 +1253,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.7.0",
+    SubTitle = "ver. 2.7.1",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1446,34 +1453,20 @@ do
 		end
 	end)
     
-	local Toggle = Tabs.Main:AddToggle("Event2", {Title = "event tasks", Default = false})
+	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Egg:", Default = true})
     Toggle:OnChanged(function()
-		if not event_rtask then
-			event_rtask = {}
-			for i,v in red_task do
-				event_rtask[i] = v
-			end
-		end
-		if not event_stask then
-			event_stask = {}
-			for i,v in street_task do
-				event_stask[i] = v
-			end
-		end
-		if Options.Event2.Value then
-			event_on = true
-			red_task = table.concat(event_task,"|").."|"..table.concat(event_rtask,"|")
-			red_task = red_task:split("|")
-			street_task = table.concat(event_stask,"|")
-			street_task = street_task:split("|")
-		else
-			event_on = false
-			red_task = table.concat(event_rtask,"|")
-			red_task = red_task:split("|")
-			street_task = table.concat(event_stask,"|").."|"..table.concat(event_task,"|")
-			street_task = street_task:split("|")
-		end
 	end)
+	local Dropdown = Tabs.Main:AddDropdown("eggs", {
+		Title = "choice egg for hatch",
+		Values = eggs,
+		Multi = false,
+		Default = 1,
+	})
+	Dropdown:OnChanged(function(egg_index)
+		Options.eggs.Close()
+	end)
+	
+	--[[
 	local Toggle = Tabs.Main:AddToggle("Event1", {Title = "Minigame 1", Default = false})
     Toggle:OnChanged(function()
 		if Options.Event1.Value then
@@ -1482,6 +1475,8 @@ do
 			--Options.Event2:SetValue(false)
 		end
 	end)
+	--]]
+	
 	
 	-------------- EVENTS ------------------
 	local t_user
@@ -2060,7 +2055,6 @@ do
 										--con_log("", "boost started")
 										first_start = false
 										Options.Farm:SetValue(false)
-										Options.Event1:SetValue(false)
 									end
 									if n == 11 then
 										break
@@ -2611,12 +2605,32 @@ function()
 					end
 					if not chk_work_ailm then
 						chk_work_ailm = true
+						local dont_buy_egg = false
 						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-							if v.id == "practice_dog" or v.id:find("minigame") or endswith(v.id, "_egg") then
+							if v.id == "practice_dog" or v.id:find("minigame") then
+							elseif endswith(v.id, "_egg") then
+								if v.id == Options.eggs.Value then
+									dont_buy_egg = v.unique
+								end
 							else
 								if v.properties.age < 6 and table.find(worked_pets, v.id) then
 									chk_work_ailm = false
 								end
+							end
+						end
+						if chk_work_ailm and Options.hatch_egg.Value then
+							--require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
+							if not dont_buy_egg then
+								if ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {}) == "success" then
+									wait(1)
+									PetID = nil
+									Pets()
+								end
+							else
+								ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(dont_buy_egg)
+								wait(1)
+								PetID = nil
+								Pets()
 							end
 						end
 					end
