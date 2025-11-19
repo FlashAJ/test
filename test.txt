@@ -6,7 +6,7 @@ repeat wait(.3) until game:IsLoaded()
 
 local ScWare = true
 
-local t_user = "METADPS"
+local t_user = "XuyGorynych456"
 
 local eggs = {
     "cracked_egg",
@@ -1261,7 +1261,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.7.2",
+    SubTitle = "ver. 2.7.3",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2473,12 +2473,16 @@ function()
 					ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
 					wait(1)
 				end
-				local tmpID = string.split(GetCurrentPetOut().unique_id, "-")
-				tmpID = table.concat(tmpID, "-", 1, #tmpID-1)
-				if PetID ~= tmpID then
-					ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-					ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(tmpID)
-					PetID = tmpID
+				if GetCurrentPetOut() then
+					local tmpID = string.split(GetCurrentPetOut().unique_id, "-")
+					tmpID = table.concat(tmpID, "-", 1, #tmpID-1)
+					if PetID ~= tmpID then
+						ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+						ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(tmpID)
+						PetID = tmpID
+					end
+				else
+					Pets()
 				end
 				
 				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "MainMap" then
