@@ -1261,7 +1261,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.7.3",
+    SubTitle = "ver. 2.7.4",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1461,6 +1461,14 @@ do
 		end
 	end)
     
+	local def_vol
+	pcall(function()
+		def_vol = readfile("egg.txt")
+	end)
+	if not def_vol then
+		def_vol = 1
+	end
+	
 	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Eggs", Default = false})
     Toggle:OnChanged(function()
 	end)
@@ -1468,10 +1476,13 @@ do
 		Title = "egg to hatch:",
 		Values = eggs,
 		Multi = false,
-		Default = 1,
+		Default = def_vol,
 	})
 	Dropdown:OnChanged(function(egg_index)
 		Options.eggs.Close()
+		pcall(function()
+			writefile("egg.txt", tostring(egg_index))
+		end)
 	end)
 	
 	--[[
@@ -2571,7 +2582,7 @@ function()
 						end
 						if chk_work_ailm and Options.hatch_egg.Value then
 							--require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
-							if not dont_buy_egg then
+							if not dont_buy_egg and Options.eggs.Value ~= "retired_egg" then
 								if ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {}) == "success" then
 									wait(1)
 									PetID = nil
@@ -2643,25 +2654,67 @@ function()
 							end
 						end
 					end)if err then con_log(err, "Error make Neon:")end
-				end
-				
-				
-				if t_user ~= "" then
-					if Players:FindFirstChild(t_user) then
-						if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
-							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-								if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 350 then
-								elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
-								elseif v.properties.age == 6 and not table.find(legendary_pets, v.id) then
-									if Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
-									else
-										ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[t_user], v.unique)
+					
+					if t_user ~= "" then
+						if Players:FindFirstChild(t_user) then
+							if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
+								local legends = {}
+								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
+									elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
+										table.insert(legends, v.unique)
+									elseif v.properties.age == 6 then
+										if table.find(legendary_pets, v.id) then
+											table.insert(legends, v.unique)
+										elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
+										else
+											ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[t_user], v.unique)
+										end
+									end
+								end
+								if #legends > 0 then
+									if not Player.PlayerGui.TradeApp.Frame.Visible then
+										ReplicatedStorage.API:FindFirstChild("TradeAPI/SendTradeRequest"):FireServer(Players[t_user])
+										wait(3)
+										local n = 0
+										while not Player.PlayerGui.TradeApp.Frame.Visible do
+											con_log("wait for tradeApp...")
+											wait(2)
+											n = n + 2
+											if n > 20 then
+												break
+											end
+										end
+										if n <= 20 then
+											for i,v in legends do
+												ReplicatedStorage.API:FindFirstChild("TradeAPI/AddItemToOffer"):FireServer(v)
+												if i == 18 then
+													break
+												end
+											end
+											wait(5)
+											ReplicatedStorage.API:FindFirstChild("TradeAPI/AcceptNegotiation"):FireServer()
+											wait(15)
+											ReplicatedStorage.API:FindFirstChild("TradeAPI/ConfirmTrade"):FireServer()
+											while Player.PlayerGui.TradeApp.Frame.Visible do
+												wait(1)
+												if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
+													pcall(function()
+														getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1]:Fire()
+														getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1]:Fire()
+														getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+													end)
+												end
+											end
+										end
 									end
 								end
 							end
 						end
 					end
 				end
+				
+				
 				
 				
 				---------------------------------
