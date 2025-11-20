@@ -6,7 +6,8 @@ repeat wait(.3) until game:IsLoaded()
 
 local ScWare = true
 
-local t_user = "XuyGorynych456"
+local t_user
+--local t_user = "XuyGorynych456"
 
 local eggs = {
     "cracked_egg",
