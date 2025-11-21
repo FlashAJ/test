@@ -2609,9 +2609,17 @@ function()
 					if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
 						for i,v in Players:GetPlayers() do
 							if v ~= Player and Player.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.Text:find(v.Name) then
-								ReplicatedStorage.API["TradeAPI/AcceptOrDeclineTradeRequest"]:InvokeServer(v, true)
 								con_log(v.Name, "found request:")
-								Player.PlayerGui.DialogApp.Dialog.Visible = false
+								local _,err=pcall(function()
+									getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()].MouseButton1Down)[1]:Fire()
+									wait(.1)
+									getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()].MouseButton1Up)[1]:Fire()
+									getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()].MouseButton1Click)[1].Function()
+								end)
+								if err then
+									ReplicatedStorage.API["TradeAPI/AcceptOrDeclineTradeRequest"]:InvokeServer(v, true)
+								end
+								--Player.PlayerGui.DialogApp.Dialog.Visible = false
 								wait(6)
 								ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
 								wait(5)
