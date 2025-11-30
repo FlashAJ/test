@@ -335,7 +335,7 @@ end)if err then con_log(err, "BAD INJECTION!")end
 
 
 if not Player.Character then
-	while not Player.PlayerGui.NewsApp.Enabled do
+	while not Player.PlayerGui.NewsApp.Enabled and not Player.Character do
 		wait()
 	end
 	local _,err=pcall(function()
@@ -1262,7 +1262,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.7.5",
+    SubTitle = "ver. 2.7.6",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1470,7 +1470,7 @@ do
 		def_vol = 1
 	end
 	
-	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Eggs", Default = false})
+	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Eggs", Default = true})
     Toggle:OnChanged(function()
 	end)
 	local Dropdown = Tabs.Main:AddDropdown("eggs", {
@@ -2606,28 +2606,41 @@ function()
 				end
 				
 				if Options.hatch_egg.Value then
-					if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
+					if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible or Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
+						local dialog = "NormalDialog"
+						if Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
+							dialog = "HeaderDialog"
+						end
 						for i,v in Players:GetPlayers() do
-							if v ~= Player and Player.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.Text:find(v.Name) then
+							if v ~= Player and Player.PlayerGui.DialogApp.Dialog[dialog].Info.TextLabel.Text:find(v.Name) then
 								con_log(v.Name, "found request:")
 								local _,err=pcall(function()
-									getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()].MouseButton1Down)[1]:Fire()
+									getconnections(Player.PlayerGui.DialogApp.Dialog[dialog].Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog[dialog].Buttons:GetChildren()].MouseButton1Down)[1]:Fire()
 									wait(.1)
-									getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()].MouseButton1Up)[1]:Fire()
-									getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren()].MouseButton1Click)[1].Function()
+									getconnections(Player.PlayerGui.DialogApp.Dialog[dialog].Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog[dialog].Buttons:GetChildren()].MouseButton1Up)[1]:Fire()
+									getconnections(Player.PlayerGui.DialogApp.Dialog[dialog].Buttons:GetChildren()[#Player.PlayerGui.DialogApp.Dialog[dialog].Buttons:GetChildren()].MouseButton1Click)[1].Function()
 								end)
 								if err then
 									ReplicatedStorage.API["TradeAPI/AcceptOrDeclineTradeRequest"]:InvokeServer(v, true)
 								end
-								--Player.PlayerGui.DialogApp.Dialog.Visible = false
-								wait(6)
-								ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
+								
 								wait(5)
-								ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
-								wait(10)
-								if Player.PlayerGui.TradeApp.Frame.Visible then
-									ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
+								local t = os.time()
+								while not Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Visible and os.time()-t < 10 do
+									wait(.3)
 								end
+								local t = os.time()
+								while Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Accept.Face.TextLabel.Text ~= "Accept" and os.time()-t < 20 do
+									wait(.3)
+								end
+								ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
+								
+								local t = os.time()
+								while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
+									wait(.3)
+								end
+								wait(1)
+								ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
 								break
 							end
 						end
@@ -2708,12 +2721,12 @@ function()
 											con_log("wait for tradeApp...")
 											wait(2)
 											n = n + 2
-											if n > 20 then
+											if n > 40 then
 												break
 											end
 										end
 										local n_item
-										if n <= 20 then
+										if n <= 40 then
 											for i,v in legends do
 												ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(v)
 												n_item = i
@@ -2723,13 +2736,17 @@ function()
 											end
 											wait(5)
 											ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
-											if n_item < 5 then
-												wait(8)
-											else
-												wait(15)
+											wait(5)
+											--while Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Accept.Face.TextLabel.Text ~= "Accept (1)" and os.time()-t < 20 do
+											local t = os.time()
+											while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
+												wait(.3)
 											end
+											wait(1)
 											ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
-											while Player.PlayerGui.TradeApp.Frame.Visible do
+											
+											local t = os.time()
+											while Player.PlayerGui.TradeApp.Frame.Visible and os.time()-t < 30 do
 												wait(1)
 												if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
 													pcall(function()
@@ -2740,6 +2757,7 @@ function()
 													end)
 												end
 											end
+											
 										end
 									end
 								end
