@@ -1244,6 +1244,7 @@ local Ps = {}
 local PetsList = {}
 local make_neon = false
 
+local visor
 
 
 local Fluent
@@ -1262,7 +1263,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.7.6",
+    SubTitle = "ver. 2.8.0",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1276,7 +1277,8 @@ local Tabs = {
     Main = Window:AddTab({ Title = "Main", Icon = "" }),
     Manag = Window:AddTab({ Title = "Manager", Icon = "" }),
     AgeUp = Window:AddTab({ Title = "Age-Up", Icon = "" }),
-	Events = Window:AddTab({ Title = "Events", Icon = "" }),
+	--Events = Window:AddTab({ Title = "Events", Icon = "" }),
+	Cash = Window:AddTab({ Title = "Cashregister", Icon = "" }),
 	Stat = Window:AddTab({ Title = "Statistics", Icon = "" }),
     --Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
@@ -1337,130 +1339,8 @@ do
 		end
     end)
 
-    
 	
-	
-	Tabs.Main:AddButton({
-        Title = "Reset",
-        Description = "Refresh players list",
-        Callback = function()
-			--if not Options.Pls.Opened then
-			--end
-			spawn(function()
-				Ps = {}
-				for i,v in next, Players:GetPlayers() do
-					table.insert(Ps, v.Name)
-				end
-				Options.Pls:SetValues(Ps)
-			end)
-		end
-    })	
-	local Dropdown = Tabs.Main:AddDropdown("Pls", {
-		Title = "Player for transfer",
-		Values = Ps,
-		Multi = false,
-		--Default = 1,
-	})
-	--Dropdown:SetValue(Banker)
-	Dropdown:OnChanged(function(pl_index)
-		--Banker = Value
-		Options.Pls.Close()
-		if pl_index and exper then
-			local pl_index = tostring(pl_index)
-			if pl_index and not Options[pl_index] then
-				local Input = Tabs.Main:AddInput("Input"..pl_index, {
-					Title = pl_index,
-					Default = "",
-					--Placeholder = "Placeholder",
-					Numeric = true,
-					Finished = false,
-				})
-				
-				local Toggle = Tabs.Main:AddToggle(pl_index, {Title = "Start transfer", Default = false})
-				Toggle:OnChanged(function()
-					spawn(function()
-						if Options[pl_index].Value then
-							--trans_cash = true
-							if not table.find(Bankers, pl_index) then
-								table.insert(Bankers, pl_index)
-							end
-						else
-							if table.find(Bankers, pl_index) then
-								table.remove(Bankers, table.find(Bankers, pl_index))
-							end
-						end
-						Ps = {}
-						for i,v in next, Players:GetPlayers() do
-							table.insert(Ps, v.Name)
-						end
-						Options.Pls:SetValues(Ps)
-					end)
-					
-					if Options[pl_index].Value then
-						spawn(function()
-							--local _,err=pcall(function()
-							local first_start = true
-							while Options[pl_index].Value and wait(1) do
-								local tmp = {}
-								for _,v in next, tmp_Bankers do
-									if v[1] == pl_index then
-										if first_start then
-											first_start = false
-											if Options["Input"..pl_index].Value ~= v[2] then
-												v[2] = tonumber(Options["Input"..pl_index].Value)
-											end
-										end
-										Options["Input"..pl_index]:SetValue(v[2])
-										if v[2] <= 0 then
-											wait(2)
-											Options[pl_index].Destroy()
-											Options["Input"..pl_index].Destroy()
-											if table.find(Bankers, pl_index) then
-												table.remove(Bankers, table.find(Bankers, pl_index))
-											end
-											kassa[pl_index] = nil
-											for num = 1, #info_bank do
-												local tmp = string.split(info_bank[num], " ")
-												if tmp[1] == pl_index then
-													if tonumber(tmp[3]) ~= 0 then
-														info_bank[num] = tmp[1].." "..tmp[2].." ".."0"
-														break
-													end
-												end
-											end
-											local _,err=pcall(function()
-												local tmp = ""
-												for _,vvvv in info_bank do
-													tmp = tmp..vvvv.."\n"
-												end
-												writefile("transfer.txt", tmp)
-											end)if err then con_log(err, "ERROR write file:")end
-										else
-											table.insert(tmp, {v[1], v[2]})
-										end
-									else
-										table.insert(tmp, {v[1], v[2]})
-									end
-								end
-								tmp_Bankers = tmp
-							end
-							--end)if err then con_log(err)end
-						end)
-					end
-				end)
-			else
-				Options[pl_index].Destroy()
-				Options["Input"..pl_index].Destroy()
-				if table.find(Bankers, pl_index) then
-					table.remove(Bankers, table.find(Bankers, pl_index))
-				end
-				kassa[pl_index] = nil
-			end
-			spawn(function()
-				Options.Pls.Value = ""
-			end)
-		end
-	end)
+
     
 	local def_vol
 	pcall(function()
@@ -1485,6 +1365,59 @@ do
 			writefile("egg.txt", tostring(egg_index))
 		end)
 	end)
+	
+	
+	pcall(function()
+		visor = readfile("host_visor.txt")
+	end)
+	local Input = Tabs.Main:AddInput("v_serv", {
+		Title = "ip address : port",
+		Default = visor,
+		--Placeholder = "Placeholder",
+		--Numeric = false,
+		--Finished = false,
+	})
+    Input:OnChanged(function()
+        visor = Input.Value
+		pcall(function()
+			writefile("host_visor.txt", visor)
+		end)
+    end)	
+	
+	
+	pcall(function()
+		local tmp = readfile("trade.txt")
+		if tmp ~= "" then
+			t_user = tmp
+		end
+	end)
+	local Input = Tabs.Main:AddInput("trade_usr", {
+		Title = "Trade with:",
+		Default = t_user,
+		--Placeholder = "Placeholder",
+		--Numeric = false,
+		--Finished = false,
+	})
+    Input:OnChanged(function()
+        t_user = Input.Value
+		writefile("trade.txt", t_user)
+    end)
+	Tabs.Main:AddButton({Title = "Send trade", --Description = "",
+        Callback = function()
+			spawn(function()
+				local _,err=pcall(function()
+					if t_user then
+						ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
+					end
+				end)
+				if err then
+					con_log(err, "Trade error:")
+				end
+			end)
+		end
+    })		
+	
+	
 	
 	--[[
 	local Toggle = Tabs.Main:AddToggle("Event1", {Title = "Minigame 1", Default = false})
@@ -1855,37 +1788,6 @@ do
 		end
     end)
 	
-	pcall(function()
-		local tmp = readfile("trade.txt")
-		if tmp ~= "" then
-			t_user = tmp
-		end
-	end)
-	local Input = Tabs.Manag:AddInput("trade_usr", {
-		Title = "Trade with:",
-		Default = t_user,
-		--Placeholder = "Placeholder",
-		--Numeric = false,
-		--Finished = false,
-	})
-    Input:OnChanged(function()
-        t_user = Input.Value
-		writefile("trade.txt", t_user)
-    end)
-	Tabs.Manag:AddButton({Title = "Send trade", --Description = "",
-        Callback = function()
-			spawn(function()
-				local _,err=pcall(function()
-					if t_user then
-						ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
-					end
-				end)
-				if err then
-					con_log(err, "Trade error:")
-				end
-			end)
-		end
-    })		
 
 
 		--------------AgeUp-------------------
@@ -2115,6 +2017,130 @@ do
 		end
     end)
 	
+	
+	
+	
+	Tabs.Cash:AddButton({
+        Title = "Reset",
+        Description = "Refresh players list",
+        Callback = function()
+			--if not Options.Pls.Opened then
+			--end
+			spawn(function()
+				Ps = {}
+				for i,v in next, Players:GetPlayers() do
+					table.insert(Ps, v.Name)
+				end
+				Options.Pls:SetValues(Ps)
+			end)
+		end
+    })	
+	local Dropdown = Tabs.Cash:AddDropdown("Pls", {
+		Title = "Player for transfer",
+		Values = Ps,
+		Multi = false,
+		--Default = 1,
+	})
+	--Dropdown:SetValue(Banker)
+	Dropdown:OnChanged(function(pl_index)
+		--Banker = Value
+		Options.Pls.Close()
+		if pl_index and exper then
+			local pl_index = tostring(pl_index)
+			if pl_index and not Options[pl_index] then
+				local Input = Tabs.Cash:AddInput("Input"..pl_index, {
+					Title = pl_index,
+					Default = "",
+					--Placeholder = "Placeholder",
+					Numeric = true,
+					Finished = false,
+				})
+				
+				local Toggle = Tabs.Cash:AddToggle(pl_index, {Title = "Start transfer", Default = false})
+				Toggle:OnChanged(function()
+					spawn(function()
+						if Options[pl_index].Value then
+							--trans_cash = true
+							if not table.find(Bankers, pl_index) then
+								table.insert(Bankers, pl_index)
+							end
+						else
+							if table.find(Bankers, pl_index) then
+								table.remove(Bankers, table.find(Bankers, pl_index))
+							end
+						end
+						Ps = {}
+						for i,v in next, Players:GetPlayers() do
+							table.insert(Ps, v.Name)
+						end
+						Options.Pls:SetValues(Ps)
+					end)
+					
+					if Options[pl_index].Value then
+						spawn(function()
+							--local _,err=pcall(function()
+							local first_start = true
+							while Options[pl_index].Value and wait(1) do
+								local tmp = {}
+								for _,v in next, tmp_Bankers do
+									if v[1] == pl_index then
+										if first_start then
+											first_start = false
+											if Options["Input"..pl_index].Value ~= v[2] then
+												v[2] = tonumber(Options["Input"..pl_index].Value)
+											end
+										end
+										Options["Input"..pl_index]:SetValue(v[2])
+										if v[2] <= 0 then
+											wait(2)
+											Options[pl_index].Destroy()
+											Options["Input"..pl_index].Destroy()
+											if table.find(Bankers, pl_index) then
+												table.remove(Bankers, table.find(Bankers, pl_index))
+											end
+											kassa[pl_index] = nil
+											for num = 1, #info_bank do
+												local tmp = string.split(info_bank[num], " ")
+												if tmp[1] == pl_index then
+													if tonumber(tmp[3]) ~= 0 then
+														info_bank[num] = tmp[1].." "..tmp[2].." ".."0"
+														break
+													end
+												end
+											end
+											local _,err=pcall(function()
+												local tmp = ""
+												for _,vvvv in info_bank do
+													tmp = tmp..vvvv.."\n"
+												end
+												writefile("transfer.txt", tmp)
+											end)if err then con_log(err, "ERROR write file:")end
+										else
+											table.insert(tmp, {v[1], v[2]})
+										end
+									else
+										table.insert(tmp, {v[1], v[2]})
+									end
+								end
+								tmp_Bankers = tmp
+							end
+							--end)if err then con_log(err)end
+						end)
+					end
+				end)
+			else
+				Options[pl_index].Destroy()
+				Options["Input"..pl_index].Destroy()
+				if table.find(Bankers, pl_index) then
+					table.remove(Bankers, table.find(Bankers, pl_index))
+				end
+				kassa[pl_index] = nil
+			end
+			spawn(function()
+				Options.Pls.Value = ""
+			end)
+		end
+	end)
 	
 	
 	local infos
@@ -2430,6 +2456,8 @@ function()
 	local bal
 	local wfile_flag = true
 	
+	local main_pets = {}
+	
 	while not Fluent.Unloaded do
 		wait(1)
 		local _,err=pcall(function()
@@ -2645,30 +2673,7 @@ function()
 							end
 						end
 					end
-					local _,err=pcall(function()
-						local Pts = {}
-						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-							if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
-								if not Pts[v.id] then
-									Pts[v.id] = {}
-								end
-								table.insert(Pts[v.id], v.unique)
-							end
-						end
-						for i, v in Pts do
-							if #v < 4 then
-							else
-								local Spec={}
-								for n=1, #v//4 do
-									local tmp = (n-1)*4
-									local res = ReplicatedStorage.API["PetAPI/DoNeonFusion"]:InvokeServer({v[tmp+1], v[tmp+2], v[tmp+3], v[tmp+4]})
-									if res then
-										con_log(i, "Create mega-neon:")
-									end
-								end
-							end
-						end
-					end)if err then con_log(err, "Error make Neon:")end
+
 					local _,err=pcall(function()
 						local Pts = {}
 						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
@@ -2694,7 +2699,215 @@ function()
 							end
 						end
 					end)if err then con_log(err, "Error make Neon:")end
+					local _,err=pcall(function()
+						local Pts = {}
+						for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+							if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
+								if not Pts[v.id] then
+									Pts[v.id] = {}
+								end
+								table.insert(Pts[v.id], v.unique)
+							end
+						end
+						for i, v in Pts do
+							if #v < 4 then
+							else
+								local Spec={}
+								for n=1, #v//4 do
+									local tmp = (n-1)*4
+									local res = ReplicatedStorage.API["PetAPI/DoNeonFusion"]:InvokeServer({v[tmp+1], v[tmp+2], v[tmp+3], v[tmp+4]})
+									if res then
+										con_log(i, "Create mega-neon:")
+									end
+								end
+							end
+						end
+					end)if err then con_log(err, "Error make Mega-Neon:")end					
 					
+					if visor and visor ~= "" and visor:find(":") then
+						local all_pets = {}
+						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+							if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 and endswith(v.id, "_egg") then
+							elseif table.find(worked_pets, v.id) then
+								if not all_pets[v.id] then
+									all_pets[v.id] = 0
+								end
+								local n = 1
+								if v.properties.neon then
+									n = 4
+								elseif v.properties.mega_neon then
+									n = 16
+								end
+								all_pets[v.id] = all_pets[v.id] + n
+							end
+						end
+						local req = {}
+						for i,v in all_pets do
+							table.insert(req, i.."="..tostring(v))
+						end
+						
+						local _,err=pcall(function()
+							local res = game:HttpGet("http://"..visor.."/"..Player.Name.."?"..table.concat(req, "&"))
+						end)
+						if err then
+							con_log(err, "VISOR error:")
+						end
+					end
+					
+					local legends = {}
+					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+						if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
+						elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
+						elseif v.properties.age == 6 then
+							if table.find(legendary_pets, v.id) and not table.find(main_pets, v.id) then
+								table.insert(legends, v.unique)
+							elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
+							elseif not table.find(main_pets, v.id) then
+								local res = ""
+								local _,err=pcall(function()
+									res = game:HttpGet("http://"..visor.."/"..v.id)
+								end)
+								if err then
+									con_log(err, "VISOR error:")
+								end
+								if res ~= "" then
+									local _,err=pcall(function()
+										if res == Player.Name then
+											table.insert(main_pets, v.id)
+										elseif Players:FindFirstChild(res) then
+											if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+												ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], v.unique)
+											end
+										end
+									end)if err then con_log(err) end
+								end
+							end
+						end
+					end
+					if #legends > 0 then
+						if not Player.PlayerGui.TradeApp.Frame.Visible then
+							local res = ""
+							local _,err=pcall(function()
+								res = game:HttpGet("http://"..visor.."/"..require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
+							end)
+							if err then
+								con_log(err, "VISOR error:")
+							end
+							if res ~= "" then
+								local _,err=pcall(function()
+									if res == Player.Name then
+										table.insert(main_pets, require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
+										res = ""
+									end
+								end)if err then con_log(err) end
+							end
+							if res ~= "" and Players:FindFirstChild(res) then
+								if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+									ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[res])
+									wait(3)
+									local n = 0
+									while not Player.PlayerGui.TradeApp.Frame.Visible do
+										con_log("wait for tradeApp...", res)
+										wait(2)
+										n = n + 2
+										if n > 40 then
+											break
+										end
+									end
+									if n <= 40 then
+										ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(legends[1])
+										wait(5)
+										ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
+										wait(5)
+										--while Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Accept.Face.TextLabel.Text ~= "Accept (1)" and os.time()-t < 20 do
+										local t = os.time()
+										while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
+											wait(.3)
+										end
+										wait(1)
+										ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
+										
+										local t = os.time()
+										while Player.PlayerGui.TradeApp.Frame.Visible and os.time()-t < 30 do
+											wait(1)
+											if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
+												pcall(function()
+													getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1]:Fire()
+													wait(.1)
+													getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1]:Fire()
+													getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+												end)
+											end
+										end
+									end
+								end
+							end
+						end
+					end					
+					
+					--[==[
+					if t_user ~= "" and Players:FindFirstChild(t_user) and not Player.PlayerGui.TradeApp.Frame.Visible then
+						if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
+							local items = {}
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+								if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
+								elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
+									table.insert(items, v.unique)
+								elseif v.properties.mega_neon then
+									table.insert(items, v.unique)
+								end
+							end
+							if #items > 0 then
+								ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
+								wait(3)
+								local n = 0
+								while not Player.PlayerGui.TradeApp.Frame.Visible do
+									con_log("wait for tradeApp...")
+									wait(2)
+									n = n + 2
+									if n > 10 then
+										break
+									end
+								end
+								
+								if n <= 10 then
+									for i,v in items do
+										ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(v)
+										if i == 18 then
+											break
+										end
+									end
+									wait(5)
+									ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
+									wait(5)
+									
+									local t = os.time()
+									while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
+										wait(.3)
+									end
+									wait(1)
+									ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
+									--[[
+									local t = os.time()
+									while Player.PlayerGui.TradeApp.Frame.Visible and os.time()-t < 30 do
+										wait(1)
+										if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
+											pcall(function()
+												getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1]:Fire()
+												wait(.1)
+												getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1]:Fire()
+												getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+											end)
+										end
+									end
+									--]]
+								end
+							end
+						end
+					end
+					--]==]
+					
+					---[[
 					if t_user ~= "" then
 						if Players:FindFirstChild(t_user) then
 							if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
@@ -2703,7 +2916,7 @@ function()
 									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
 									elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 										table.insert(legends, v.unique)
-									elseif v.properties.age == 6 then
+									elseif v.properties.mega_neon then
 										if table.find(legendary_pets, v.id) then
 											table.insert(legends, v.unique)
 										elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
@@ -2721,12 +2934,12 @@ function()
 											con_log("wait for tradeApp...")
 											wait(2)
 											n = n + 2
-											if n > 40 then
+											if n > 10 then
 												break
 											end
 										end
 										local n_item
-										if n <= 40 then
+										if n <= 10 then
 											for i,v in legends do
 												ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(v)
 												n_item = i
@@ -2764,6 +2977,7 @@ function()
 							end
 						end
 					end
+					--]]
 				end
 				
 				
