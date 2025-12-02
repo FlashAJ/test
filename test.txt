@@ -2724,126 +2724,129 @@ function()
 						end
 					end)if err then con_log(err, "Error make Mega-Neon:")end					
 					
-					if visor and visor ~= "" and visor:find(":") then
-						local all_pets = {}
-						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-							if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 and endswith(v.id, "_egg") then
-							elseif table.find(worked_pets, v.id) then
-								if not all_pets[v.id] then
-									all_pets[v.id] = 0
-								end
-								local n = 1
-								if v.properties.neon then
-									n = 4
-								elseif v.properties.mega_neon then
-									n = 16
-								end
-								all_pets[v.id] = all_pets[v.id] + n
-							end
-						end
-						local req = {}
-						for i,v in all_pets do
-							table.insert(req, i.."="..tostring(v))
-						end
-						
-						local _,err=pcall(function()
-							local res = game:HttpGet("http://"..visor.."/"..Player.Name.."?"..table.concat(req, "&"))
-						end)
-						if err then
-							con_log(err, "VISOR error:")
-						end
-					end
-					
-					local legends = {}
-					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-						if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
-						elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
-						elseif v.properties.age == 6 then
-							if table.find(legendary_pets, v.id) then--and not table.find(main_pets, v.id) then
-								table.insert(legends, v.unique)
-							elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
-							else--if not table.find(main_pets, v.id) then
-								local res = ""
-								local _,err=pcall(function()
-									res = game:HttpGet("http://"..visor.."/"..v.id)
-								end)
-								if err then
-									con_log(err, "VISOR error:")
-								end
-								if res ~= "" then
-									local _,err=pcall(function()
-										if res == Player.Name then
-											--table.insert(main_pets, v.id)
-										elseif Players:FindFirstChild(res) then
-											if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
-												ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], v.unique)
-											end
-										end
-									end)if err then con_log(err) end
+					if visor then
+						if visor ~= "" and visor:find(":") then
+							local all_pets = {}
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+								if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 and endswith(v.id, "_egg") then
+								elseif table.find(worked_pets, v.id) then
+									if not all_pets[v.id] then
+										all_pets[v.id] = 0
+									end
+									local n = 1
+									if v.properties.neon then
+										n = 4
+									elseif v.properties.mega_neon then
+										n = 16
+									end
+									all_pets[v.id] = all_pets[v.id] + n
 								end
 							end
-						end
-					end
-					if #legends > 0 then
-						if not Player.PlayerGui.TradeApp.Frame.Visible then
-							local res = ""
+							local req = {}
+							for i,v in all_pets do
+								table.insert(req, i.."="..tostring(v))
+							end
+							
 							local _,err=pcall(function()
-								res = game:HttpGet("http://"..visor.."/"..require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
+								local res = game:HttpGet("http://"..visor.."/"..Player.Name.."?"..table.concat(req, "&"))
 							end)
 							if err then
 								con_log(err, "VISOR error:")
 							end
-							if res ~= "" then
-								local _,err=pcall(function()
-									if res == Player.Name then
-										--table.insert(main_pets, require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
-										res = ""
+							
+							local legends = {}
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+								if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
+								elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
+								elseif v.properties.age == 6 then
+									if table.find(legendary_pets, v.id) then--and not table.find(main_pets, v.id) then
+										table.insert(legends, v.unique)
+									elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
+									else--if not table.find(main_pets, v.id) then
+										local res = ""
+										local _,err=pcall(function()
+											res = game:HttpGet("http://"..visor.."/"..v.id)
+										end)
+										if err then
+											con_log(err, "VISOR error:")
+										end
+										if res ~= "" then
+											local _,err=pcall(function()
+												if res == Player.Name then
+													--table.insert(main_pets, v.id)
+												elseif Players:FindFirstChild(res) then
+													if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+														ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], v.unique)
+													end
+												end
+											end)if err then con_log(err) end
+										end
 									end
-								end)if err then con_log(err) end
+								end
 							end
-							if res ~= "" and Players:FindFirstChild(res) then
-								if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
-									ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[res])
-									wait(3)
-									local n = 0
-									while not Player.PlayerGui.TradeApp.Frame.Visible do
-										con_log("wait for tradeApp...", res)
-										wait(2)
-										n = n + 2
-										if n > 40 then
-											break
-										end
+							if #legends > 0 then
+								if not Player.PlayerGui.TradeApp.Frame.Visible then
+									local res = ""
+									local _,err=pcall(function()
+										res = game:HttpGet("http://"..visor.."/"..require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
+									end)
+									if err then
+										con_log(err, "VISOR error:")
 									end
-									if n <= 40 then
-										ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(legends[1])
-										wait(5)
-										ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
-										wait(5)
-										--while Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Accept.Face.TextLabel.Text ~= "Accept (1)" and os.time()-t < 20 do
-										local t = os.time()
-										while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
-											wait(.3)
-										end
-										wait(1)
-										ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
-										
-										local t = os.time()
-										while Player.PlayerGui.TradeApp.Frame.Visible and os.time()-t < 30 do
-											wait(1)
-											if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
-												pcall(function()
-													getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1]:Fire()
-													wait(.1)
-													getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1]:Fire()
-													getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
-												end)
+									if res ~= "" then
+										local _,err=pcall(function()
+											if res == Player.Name then
+												--table.insert(main_pets, require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
+												res = ""
+											end
+										end)if err then con_log(err) end
+									end
+									if res ~= "" and Players:FindFirstChild(res) then
+										if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+											ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[res])
+											wait(3)
+											local n = 0
+											while not Player.PlayerGui.TradeApp.Frame.Visible do
+												con_log("wait for tradeApp...", res)
+												wait(2)
+												n = n + 2
+												if n > 40 then
+													break
+												end
+											end
+											if n <= 40 then
+												ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(legends[1])
+												wait(5)
+												ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
+												wait(5)
+												--while Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Accept.Face.TextLabel.Text ~= "Accept (1)" and os.time()-t < 20 do
+												local t = os.time()
+												while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
+													wait(.3)
+												end
+												wait(1)
+												ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
+												
+												local t = os.time()
+												while Player.PlayerGui.TradeApp.Frame.Visible and os.time()-t < 30 do
+													wait(1)
+													if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
+														pcall(function()
+															getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1]:Fire()
+															wait(.1)
+															getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1]:Fire()
+															getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+														end)
+													end
+												end
 											end
 										end
 									end
 								end
 							end
 						end
-					end					
+					end
+					
 					
 					---[[
 					if t_user ~= "" then
