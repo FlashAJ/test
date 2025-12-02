@@ -1263,7 +1263,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.0",
+    SubTitle = "ver. 2.8.1",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2759,10 +2759,10 @@ function()
 						if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
 						elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 						elseif v.properties.age == 6 then
-							if table.find(legendary_pets, v.id) and not table.find(main_pets, v.id) then
+							if table.find(legendary_pets, v.id) then--and not table.find(main_pets, v.id) then
 								table.insert(legends, v.unique)
 							elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
-							elseif not table.find(main_pets, v.id) then
+							else--if not table.find(main_pets, v.id) then
 								local res = ""
 								local _,err=pcall(function()
 									res = game:HttpGet("http://"..visor.."/"..v.id)
@@ -2773,7 +2773,7 @@ function()
 								if res ~= "" then
 									local _,err=pcall(function()
 										if res == Player.Name then
-											table.insert(main_pets, v.id)
+											--table.insert(main_pets, v.id)
 										elseif Players:FindFirstChild(res) then
 											if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
 												ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], v.unique)
@@ -2796,7 +2796,7 @@ function()
 							if res ~= "" then
 								local _,err=pcall(function()
 									if res == Player.Name then
-										table.insert(main_pets, require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
+										--table.insert(main_pets, require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[legends[1]].id)
 										res = ""
 									end
 								end)if err then con_log(err) end
@@ -2844,68 +2844,6 @@ function()
 							end
 						end
 					end					
-					
-					--[==[
-					if t_user ~= "" and Players:FindFirstChild(t_user) and not Player.PlayerGui.TradeApp.Frame.Visible then
-						if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
-							local items = {}
-							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-								if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
-								elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
-									table.insert(items, v.unique)
-								elseif v.properties.mega_neon then
-									table.insert(items, v.unique)
-								end
-							end
-							if #items > 0 then
-								ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
-								wait(3)
-								local n = 0
-								while not Player.PlayerGui.TradeApp.Frame.Visible do
-									con_log("wait for tradeApp...")
-									wait(2)
-									n = n + 2
-									if n > 10 then
-										break
-									end
-								end
-								
-								if n <= 10 then
-									for i,v in items do
-										ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(v)
-										if i == 18 then
-											break
-										end
-									end
-									wait(5)
-									ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
-									wait(5)
-									
-									local t = os.time()
-									while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
-										wait(.3)
-									end
-									wait(1)
-									ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
-									--[[
-									local t = os.time()
-									while Player.PlayerGui.TradeApp.Frame.Visible and os.time()-t < 30 do
-										wait(1)
-										if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then
-											pcall(function()
-												getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1]:Fire()
-												wait(.1)
-												getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1]:Fire()
-												getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
-											end)
-										end
-									end
-									--]]
-								end
-							end
-						end
-					end
-					--]==]
 					
 					---[[
 					if t_user ~= "" then
