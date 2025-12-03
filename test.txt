@@ -2902,24 +2902,24 @@ function()
 									if #legends < 18 and Options.give_items.Value then
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts do
 											table.insert(legends, v.unique)
-											con_log(v.id)
+											--con_log(v.id)
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.toys do
 											if v.id ~= "trade_license" and not v.id:find("default") then
 												table.insert(legends, v.unique)
-												con_log(v.id)
+												--con_log(v.id)
 											end
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.transport do
 											if v.id ~= "ice_skates" then
 												table.insert(legends, v.unique)
-												con_log(v.id)
+												--con_log(v.id)
 											end
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.strollers do
 											if not v.id:find("default") then
 												table.insert(legends, v.unique)
-												con_log(v.id)
+												--con_log(v.id)
 											end
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.stickers do
@@ -2929,20 +2929,20 @@ function()
 											"ice_dimension_2025_snowy_mammoth_sticker",
 											"ice_dimension_2025_frostbite_bear_sticker"}, v.id) then
 												table.insert(legends, v.unique)
-												con_log(v.id)
+												--con_log(v.id)
 											end
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pet_accessories do
 											if not table.find({"white_bowtie", "cowbell", "blue_cap"}, v.id) then
 												table.insert(legends, v.unique)
-												con_log(v.id)
+												--con_log(v.id)
 											end
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
 											if v.id:find("potion") then
 												if not v.id:find("pet_age_potion") then
 													table.insert(legends, v.unique)
-													con_log(v.id)
+													--con_log(v.id)
 												end
 											end
 										end
