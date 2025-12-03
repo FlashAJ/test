@@ -2024,6 +2024,21 @@ do
 	
 	
 	
+	local Toggle = Tabs.Cash:AddToggle("buy_eggs", {Title = "Buy seasonal Eggs", Default = false})
+    Toggle:OnChanged(function()
+		spawn(function()
+			while Options.buy_eggs.Value do
+				result = ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", "aztec_egg_2025_aztec_egg", {})
+				if result ~= "success" or require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money < 1500 then --too little money
+					Options.buy_eggs:SetValue(false)
+					break
+				end
+			wait()
+			end				
+		end)
+	end)
+	
+	
 	Tabs.Cash:AddButton({
         Title = "Reset",
         Description = "Refresh players list",
