@@ -2913,7 +2913,7 @@ function()
 									
 									if #legends < 18 and Options.give_items.Value then
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts do
-											if not v.id:find("furniture") then
+											if not v.id:find("furniture") and not v.id:find("funiture") then
 												table.insert(legends, v.unique)
 												--con_log(v.id)
 											end
