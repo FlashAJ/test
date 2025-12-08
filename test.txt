@@ -1263,7 +1263,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.3",
+    SubTitle = "ver. 2.8.4",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2521,15 +2521,24 @@ function()
 			if is_manager then
 				if bal ~= require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money then
 					bal = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
-					writefile("balances.txt", tostring(bal))
+					--writefile("balances.txt", tostring(bal))
 				end
 			elseif wfile_flag then
-				writefile("balances.txt", "-1")
+				--writefile("balances.txt", "-1")
 				wfile_flag = false
 			end
 			
 			if farm and not busy and not event_flag then
 				busy = true
+				local check_sell_house
+				local _,err=pcall(function()
+					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_manager do
+						if v.name == "My Christmas Pudding House" then
+							ReplicatedStorage.API["HousingAPI/SellHouse"]:InvokeServer(v.house_id)
+							check_sell_house = true
+						end
+					end
+				end)
 				local _,err=pcall(function()
 					if GetCurrentPetOut().goal_state.distance_to_owner > 50 or tostring(GetCurrentPetOut().goal_state.distance_to_owner) == "nan" then
 						con_log(GetCurrentPetOut().goal_state.distance_to_owner)-------
@@ -2593,14 +2602,15 @@ function()
 					--]]
 				end
 				
-				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" and
-				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture then
+				if check_sell_house or (require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id == "Neighborhood" and
+				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture) then
 					--if not busy then
 						busy = true
 						wait(15)
 						local _,err=pcall(function()
 							con_log("babyfarm")----
 							ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
+							wait(2)
 							local n = 0
 							while n < 20 do
 								wait(1)
@@ -2609,6 +2619,11 @@ function()
 									break
 								end
 							end
+							bed = Furniture(Beds)
+							wash = Furniture(Washings)
+							toil = Furniture({"Toilet"})
+							f_bowl = Furniture(bowls_f)
+							w_bowl = Furniture(bowls_w)
 							wait(2)
 							Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
 							Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
