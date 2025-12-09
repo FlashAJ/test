@@ -324,6 +324,7 @@ local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
 
 
+
 for i,v in next, getconnections(Player.Idled) do v:Disable() end
 
 local _,err=pcall(function()
@@ -332,6 +333,11 @@ local _,err=pcall(function()
 	end
 end)if err then con_log(err, "BAD INJECTION!")end
 
+
+local _,VIP=pcall(function()return game:GetService("MarketplaceService"):UserOwnsGamePassAsync(Player.UserId, 3196348)end)
+--if Player.Name == "Trulala09348" then
+--VIP = true
+--end
 
 
 if not Player.Character then
@@ -1263,7 +1269,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.4",
+    SubTitle = "ver. 2.8.5",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2488,6 +2494,7 @@ function()
 	local wfile_flag = true
 	
 	local main_pets = {}
+	local send_for_egg = {}
 	
 	while not Fluent.Unloaded do
 		wait(1)
@@ -2642,12 +2649,12 @@ function()
 					end
 					if not chk_work_ailm then
 						chk_work_ailm = true
-						local dont_buy_egg = false
+						local egg_uniq
 						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
 							if v.id == "practice_dog" or v.id:find("minigame") then
 							elseif endswith(v.id, "_egg") then
 								if v.id == Options.eggs.Value then
-									dont_buy_egg = v.unique
+									egg_uniq = v.unique
 								end
 							else
 								if v.properties.age < 6 and table.find(worked_pets, v.id) then
@@ -2657,14 +2664,28 @@ function()
 						end
 						if chk_work_ailm and Options.hatch_egg.Value then
 							--require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
-							if not dont_buy_egg and Options.eggs.Value ~= "retired_egg" then
-								if ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {}) == "success" then
-									wait(1)
-									PetID = nil
-									Pets()
+							if not egg_uniq then
+								if Options.eggs.Value == "retired_egg" and not VIP then
+									local res = ""
+									local _,err=pcall(function()
+										res = game:HttpGet("http://"..visor.."/old_egg?"..Player.Name)
+									end)
+									if res ~= "" then
+										if not send_for_egg[res] then
+											send_for_egg[res] = {os.time()-120, 600}
+										elseif send_for_egg[res][1] + 120 > os.time() then
+											send_for_egg[res][1] = os.time()
+										end
+									end
+								else
+									if ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {}) == "success" then
+										wait(1)
+										PetID = nil
+										Pets()
+									end
 								end
 							else
-								ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(dont_buy_egg)
+								ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(egg_uniq)
 								wait(1)
 								PetID = nil
 								Pets()
@@ -2680,6 +2701,38 @@ function()
 				end
 				
 				if Options.hatch_egg.Value then
+					local _,err=pcall(function()
+						for res,t in send_for_egg or {} do
+							if t[1]+120 >= os.time() and t[2] > 0 then
+								if Players:FindFirstChild(res) then
+									if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+										GoToHome(res)
+										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
+											if v.id == "mannequins_2024_mannequin" then
+												if v.price == 100 then
+													for _=1,3 do
+														pcall(function()
+															ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", v.outfit_name)
+														end)
+														local _,err_ch=pcall(function()
+															buy = ReplicatedStorage.API["AvatarAPI/BuyMannequinOutfit"]:InvokeServer(Players[res], i, v.outfit_version, 100)
+															send_for_egg[res][2] = send_for_egg[res][2] - 100
+															wait()
+															ReplicatedStorage.API["AvatarAPI/DeleteOutfit"]:FireServer("player", v.outfit_name)
+														end)if err_ch then con_log(err_ch)end
+														wait(.3)
+													end
+													break
+												end
+											end
+										end
+										GoToHome()
+										send_for_egg[res][1] = os.time()
+									end
+								end
+							end
+						end
+					end)if err then con_log(err) end
 					local _,err=pcall(function()
 						if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible or Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
 							local dialog = "NormalDialog"
@@ -2804,6 +2857,28 @@ function()
 								
 								local _,err=pcall(function()
 									local res = game:HttpGet("http://"..visor.."/"..Player.Name.."?"..table.concat(req, "&"))
+									if VIP then
+										local res = game:HttpGet("http://"..visor.."/VIP?"..Player.Name)
+										if Players:FindFirstChild(res) then
+											if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+												local unq
+												while not unq do
+													for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+														if v.id == "retired_egg" then
+															unq = v.unique
+															break
+														end
+													end
+													if not unq then
+														if ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", "retired_egg", {}) ~= "success" then
+															break
+														end
+													end
+												end
+												ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], unq)
+											end
+										end
+									end
 								end)
 								if err then
 									con_log(err, "VISOR error:")
