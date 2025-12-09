@@ -335,9 +335,9 @@ end)if err then con_log(err, "BAD INJECTION!")end
 
 
 local _,VIP=pcall(function()return game:GetService("MarketplaceService"):UserOwnsGamePassAsync(Player.UserId, 3196348)end)
---if Player.Name == "Trulala09348" then
---VIP = true
---end
+if Player.Name == "Trulala09348" then
+VIP = true
+end
 
 
 if not Player.Character then
@@ -2313,7 +2313,7 @@ function()
 				local _,err=pcall(function()
 					local _,err=pcall(function()
 						getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DontShow",true).Activated)[1]:Fire()
-						wait(.1)
+						wait(.3)
 					end)
 					getconnections(Player.PlayerGui.PlaytimePayoutsApp:FindFirstChild("DepthButton",true).MouseButton1Down)[1]:Fire()
 					--game:GetService("ReplicatedStorage").API:FindFirstChild("PayAPI/Collect"):FireServer()
@@ -2673,7 +2673,7 @@ function()
 									if res ~= "" then
 										if not send_for_egg[res] then
 											send_for_egg[res] = {os.time()-120, 600}
-										elseif send_for_egg[res][1] + 120 > os.time() then
+										elseif send_for_egg[res][1] + 120 < os.time() then
 											send_for_egg[res][1] = os.time()
 										end
 									end
@@ -2703,7 +2703,7 @@ function()
 				if Options.hatch_egg.Value then
 					local _,err=pcall(function()
 						for res,t in send_for_egg or {} do
-							if t[1]+120 >= os.time() and t[2] > 0 then
+							if t[1]+120 <= os.time() and t[2] > 0 then
 								if Players:FindFirstChild(res) then
 									if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
 										GoToHome(res)
