@@ -1269,7 +1269,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.5",
+    SubTitle = "ver. 2.8.6",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2675,6 +2675,9 @@ function()
 											send_for_egg[res] = {os.time()-120, 600}
 										elseif send_for_egg[res][1] + 120 < os.time() then
 											send_for_egg[res][1] = os.time()
+											if send_for_egg[res][2] == 0 then
+												send_for_egg[res][2] = 600
+											end
 										end
 									end
 								else
@@ -2689,6 +2692,19 @@ function()
 								wait(1)
 								PetID = nil
 								Pets()
+								local n = 0
+								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+									if v.id == "retired_egg" then
+										n = n + 1
+									end
+								end
+								if n > 1 then
+									for res,t in send_for_egg or {} do
+										if t[2] < 1000 then
+											send_for_egg[res][2] = send_for_egg[res][2] + (n-1)*600
+										end
+									end
+								end
 							end
 						end
 					end
@@ -2728,6 +2744,9 @@ function()
 										end
 										GoToHome()
 										send_for_egg[res][1] = os.time()
+										if send_for_egg[res][2] < 100 then
+											send_for_egg = {}
+										end
 									end
 								end
 							end
