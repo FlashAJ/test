@@ -2937,7 +2937,7 @@ function()
 									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
 									elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 									elseif v.properties.age == 6 then
-										if not Options.with_bottle.Value or v.properties.xp < 1300 then
+										if not Options.with_bottle.Value or v.properties.xp <= 1700 then
 											if table.find(legendary_pets, v.id) then--and not table.find(main_pets, v.id) then
 												table.insert(legends, v.unique)
 											elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
@@ -3111,12 +3111,12 @@ function()
 												con_log("wait for tradeApp...")
 												wait(2)
 												n = n + 2
-												if n > 20 then
+												if n > 10 then
 													break
 												end
 											end
 											local n_item
-											if n <= 20 then
+											if n <= 10 then
 												for i,v in legends do
 													ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(v)
 													n_item = i
