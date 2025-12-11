@@ -1269,7 +1269,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.7",
+    SubTitle = "ver. 2.8.8",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2937,27 +2937,29 @@ function()
 									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
 									elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 									elseif v.properties.age == 6 then
-										if table.find(legendary_pets, v.id) then--and not table.find(main_pets, v.id) then
-											table.insert(legends, v.unique)
-										elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
-										else--if not table.find(main_pets, v.id) then
-											local res = ""
-											local _,err=pcall(function()
-												res = game:HttpGet("http://"..visor.."/"..v.id)
-											end)
-											if err then
-												con_log(err, "VISOR error:")
-											end
-											if res ~= "" then
+										if not Options.with_bottle.Value or v.properties.xp < 1300 then
+											if table.find(legendary_pets, v.id) then--and not table.find(main_pets, v.id) then
+												table.insert(legends, v.unique)
+											elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
+											else--if not table.find(main_pets, v.id) then
+												local res = ""
 												local _,err=pcall(function()
-													if res == Player.Name then
-														--table.insert(main_pets, v.id)
-													elseif Players:FindFirstChild(res) then
-														if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
-															ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], v.unique)
+													res = game:HttpGet("http://"..visor.."/"..v.id)
+												end)
+												if err then
+													con_log(err, "VISOR error:")
+												end
+												if res ~= "" then
+													local _,err=pcall(function()
+														if res == Player.Name then
+															--table.insert(main_pets, v.id)
+														elseif Players:FindFirstChild(res) then
+															if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+																ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[res], v.unique)
+															end
 														end
-													end
-												end)if err then con_log(err) end
+													end)if err then con_log(err) end
+												end
 											end
 										end
 									end
