@@ -1170,6 +1170,7 @@ local function endswith(str, ending)
    return ending == "" or str:sub(-#ending) == ending
 end
 
+local neon_enabled
 
 local function Pets()
 	if not PetID and GetCurrentPetOut() then
@@ -1193,7 +1194,7 @@ local function Pets()
 					t1 = tostring(t1)
 				end
 				t1 = tostring(n.properties.age)..t1
-				if n.properties.neon then
+				if n.properties.neon and neon_enabled then
 					t1 = "1"..t1
 				else
 					t1 = "0"..t1
@@ -1269,7 +1270,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.8",
+    SubTitle = "ver. 2.8.9",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2353,6 +2354,11 @@ function()
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1].Function()
 				--getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1]:Fire()
 			end
+			if Player.PlayerGui.DialogApp.Dialog.ItemPreviewDialog.Visible then
+				set_thread_identity(2)
+				require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DialogApp", false)
+				set_thread_identity(7)
+			end
 			--[==[
 			local tmp=require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025
 			if tmp then
@@ -2663,6 +2669,9 @@ function()
 									if v.properties.age < 6 and table.find(worked_pets, v.id) then
 										chk_work_ailm = false
 									end
+									--if Options.with_bottle.Value and v.properties.xp > 2400 then--and table.find(worked_pets, v.id) then
+										--chk_work_ailm = false
+									--end
 								end
 							end
 							if chk_work_ailm and Options.hatch_egg.Value then
@@ -2715,6 +2724,7 @@ function()
 							ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
 							wait(1)
 							PetID = nil
+							neon_enabled = not Options.with_bottle.Value
 							Pets()
 						end
 					end
