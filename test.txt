@@ -335,9 +335,9 @@ end)if err then con_log(err, "BAD INJECTION!")end
 
 
 local _,VIP=pcall(function()return game:GetService("MarketplaceService"):UserOwnsGamePassAsync(Player.UserId, 3196348)end)
-if Player.Name == "Trulala09348" then
-VIP = true
-end
+--if Player.Name == "Trulala09348" then
+--VIP = true
+--end
 
 
 if not Player.Character then
@@ -1270,7 +1270,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.9",
+    SubTitle = "ver. 2.8.10",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2355,9 +2355,15 @@ function()
 				--getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Click)[1]:Fire()
 			end
 			if Player.PlayerGui.DialogApp.Dialog.ItemPreviewDialog.Visible then
-				set_thread_identity(2)
-				require(ReplicatedStorage.Fsys).load("UIManager").set_app_visibility("DialogApp", false)
-				set_thread_identity(7)
+				getconnections(Player.PlayerGui.DialogApp.Dialog.ExitButton.MouseButton1Down)[1]:Fire()
+				wait(.1)
+				getconnections(Player.PlayerGui.DialogApp.Dialog.ExitButton.MouseButton1Up)[1]:Fire()
+				getconnections(Player.PlayerGui.DialogApp.Dialog.ExitButton.MouseButton1Click)[1].Function()
+				ReplicatedStorage.API["HousingAPI/ClaimAllDeliveries"]:FireServer()
+				if PetID then
+					wait(1)
+					ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+				end
 			end
 			--[==[
 			local tmp=require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].social_stones_2025
@@ -3108,6 +3114,9 @@ function()
 													table.insert(legends, v.unique)
 													--con_log(v.id)
 												end
+											elseif v.id == "winter_2025_yarn_beanie_bait" then
+													--con_log(v.id)
+												table.insert(legends, v.unique)
 											end
 										end
 									end
