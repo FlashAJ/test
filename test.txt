@@ -1270,7 +1270,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.10",
+    SubTitle = "ver. 2.8.11",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2672,8 +2672,10 @@ function()
 										egg_uniq = v.unique
 									end
 								else
-									if v.properties.age < 6 and table.find(worked_pets, v.id) then
-										chk_work_ailm = false
+									if v.properties.age < 6 or v.properties.xp >= 2400 then
+										if table.find(worked_pets, v.id) then
+											chk_work_ailm = false
+										end
 									end
 									--if Options.with_bottle.Value and v.properties.xp > 2400 then--and table.find(worked_pets, v.id) then
 										--chk_work_ailm = false
@@ -2850,7 +2852,7 @@ function()
 							local Pts = {}
 							for uniq, v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
 								--if v.properties.age == 6 and v.properties.neon and not v.properties.mega_neon then
-								if v.properties.age == 6 and not v.properties.neon and not v.properties.mega_neon and v.properties.friendship_level < 300 then
+								if v.properties.age == 6 and not v.properties.neon and not v.properties.mega_neon and v.properties.friendship_level < 10 then
 									if not Pts[v.id] then
 										Pts[v.id] = {}
 									end
@@ -2900,7 +2902,7 @@ function()
 							if visor ~= "" and visor:find(":") then
 								local all_pets = {}
 								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 and endswith(v.id, "_egg") then
+									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 10 and endswith(v.id, "_egg") then
 									elseif table.find(worked_pets, v.id) then
 										if not all_pets[v.id] then
 											all_pets[v.id] = 0
@@ -2950,7 +2952,7 @@ function()
 								
 								local legends = {}
 								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
+									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 10 then
 									elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 									elseif v.properties.age == 6 then
 										if not Options.with_bottle.Value or v.properties.xp < 2400 then
@@ -3050,7 +3052,7 @@ function()
 								if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
 									local legends = {}
 									for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-										if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 300 then
+										if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 10 then
 										elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 											table.insert(legends, v.unique)
 										elseif v.properties.mega_neon then
