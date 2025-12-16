@@ -2655,7 +2655,7 @@ function()
 				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.age == 6 or 
 				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].id == "practice_dog" then
 					if Options.with_bottle.Value and require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.xp >= 2400 then
-					elseif Options.with_bottle.Value then
+					elseif Options.hatch_egg.Value then
 						local chk_work_ailm
 						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] or {} do
 							if i:find("mystery") or table.find(red_task, i) or table.find(wend_task, i) or table.find(care_task, i) then
