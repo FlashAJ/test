@@ -1277,7 +1277,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.12",
+    SubTitle = "ver. 2.8.13",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2971,7 +2971,7 @@ function()
 								
 								local legends = {}
 								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 10 then
+									if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 10 or v.unique == PetID then
 									elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 									elseif v.properties.age == 6 then
 										if not Options.with_bottle.Value or v.properties.xp < 2400 then
