@@ -264,6 +264,13 @@ local cards = {
 }
 
 
+local egg_price = {
+    ["cracked_egg"] = 350,
+    ["regular_pet_egg"] = 600,
+    ["royal_egg"] = 1450,
+    ["retired_egg"] = 600,
+}
+
 local PetID
 local Pet
 local bed
@@ -1270,7 +1277,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.11",
+    SubTitle = "ver. 2.8.12",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2654,86 +2661,98 @@ function()
 				
 				if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.age == 6 or 
 				require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].id == "practice_dog" then
-					if Options.with_bottle.Value and require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.xp >= 2400 then
-					elseif Options.hatch_egg.Value then
-						local chk_work_ailm
-						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] or {} do
-							if i:find("mystery") or table.find(red_task, i) or table.find(wend_task, i) or table.find(care_task, i) then
-								chk_work_ailm = true
-							end
-						end
-						if not chk_work_ailm then
-							chk_work_ailm = true
-							local egg_uniq
-							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-								if v.id == "practice_dog" or v.id:find("minigame") then
-								elseif endswith(v.id, "_egg") then
-									if v.id == Options.eggs.Value then
-										egg_uniq = v.unique
-									end
-								else
-									if v.properties.age < 6 or v.properties.xp >= 2400 then
-										if table.find(worked_pets, v.id) then
-											chk_work_ailm = false
-										end
-									end
-									--if Options.with_bottle.Value and v.properties.xp > 2400 then--and table.find(worked_pets, v.id) then
-										--chk_work_ailm = false
-									--end
+					if Options.hatch_egg.Value then
+						if Options.with_bottle.Value and require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].properties.xp >= 2400 then
+						--con_log("","ПИДАРАСИНА")
+						else
+							local chk_work_ailm
+							local not_hide
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] or {} do
+								if i:find("mystery") or table.find(red_task, i) or table.find(wend_task, i) or table.find(care_task, i) then
+									chk_work_ailm = true
 								end
 							end
-							if chk_work_ailm and Options.hatch_egg.Value then
-								--require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
-								if not egg_uniq then
-									if Options.eggs.Value == "retired_egg" and not VIP then
-										local res = ""
-										local _,err=pcall(function()
-											res = game:HttpGet("http://"..visor.."/old_egg?"..Player.Name)
-										end)
-										if res ~= "" then
-											if not send_for_egg[res] then
-												send_for_egg[res] = {os.time()-120, 600}
-											elseif send_for_egg[res][1] + 120 < os.time() then
-												send_for_egg[res][1] = os.time()
-												if send_for_egg[res][2] == 0 then
-													send_for_egg[res][2] = 600
+							if not chk_work_ailm then
+								chk_work_ailm = true
+								local egg_uniq
+								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+									if v.id == "practice_dog" or v.id:find("minigame") then
+									elseif endswith(v.id, "_egg") then
+										if v.id == Options.eggs.Value then
+											egg_uniq = v.unique
+										end
+									else
+										if v.properties.age < 6 or v.properties.xp >= 2400 then
+											if table.find(worked_pets, v.id) then
+												chk_work_ailm = false
+												if v.properties.xp >= 2400 and PetID == v.unique then
+													not_hide = true
+												end
+											end
+										end
+										--if Options.with_bottle.Value and v.properties.xp > 2400 then--and table.find(worked_pets, v.id) then
+											--chk_work_ailm = false
+										--end
+									end
+								end
+								if chk_work_ailm and Options.hatch_egg.Value then
+									--require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money
+									if not egg_uniq then
+										if Options.eggs.Value == "retired_egg" and not VIP then
+											local res = ""
+											local _,err=pcall(function()
+												res = game:HttpGet("http://"..visor.."/old_egg?"..Player.Name)
+											end)
+											if res ~= "" then
+												if not send_for_egg[res] then
+													send_for_egg[res] = {os.time()-120, 600}
+												elseif send_for_egg[res][1] + 120 < os.time() then
+													send_for_egg[res][1] = os.time()
+													if send_for_egg[res][2] == 0 then
+														send_for_egg[res][2] = 600
+													end
+												end
+											end
+										else
+											if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money >= egg_price[Options.eggs.Value] then
+												local buy = ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {})
+												if buy == "success" then
+													wait(1)
+													PetID = nil
+													Pets()
+												else
+													con_log(buy, "wrong buy egg:")
 												end
 											end
 										end
 									else
-										if ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {}) == "success" then
-											wait(1)
-											PetID = nil
-											Pets()
+										ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(egg_uniq)
+										wait(1)
+										PetID = nil
+										Pets()
+										local n = 0
+										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+											if v.id == "retired_egg" then
+												n = n + 1
+											end
 										end
-									end
-								else
-									ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(egg_uniq)
-									wait(1)
-									PetID = nil
-									Pets()
-									local n = 0
-									for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-										if v.id == "retired_egg" then
-											n = n + 1
-										end
-									end
-									if n > 1 then
-										for res,t in send_for_egg or {} do
-											if t[2] < 1000 then
-												send_for_egg[res][2] = send_for_egg[res][2] + (n-1)*600
+										if n > 1 then
+											for res,t in send_for_egg or {} do
+												if t[2] < 1000 then
+													send_for_egg[res][2] = send_for_egg[res][2] + (n-1)*600
+												end
 											end
 										end
 									end
 								end
 							end
-						end
-						if not chk_work_ailm then
-							ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-							wait(1)
-							PetID = nil
-							neon_enabled = not Options.with_bottle.Value
-							Pets()
+							if not chk_work_ailm and not not_hide then
+								ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+								wait(1)
+								PetID = nil
+								neon_enabled = not Options.with_bottle.Value
+								Pets()
+							end
 						end
 					end
 				elseif Options.with_bottle.Value and not endswith(require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[PetID].id, "_egg") then
