@@ -1277,7 +1277,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.13",
+    SubTitle = "ver. 2.8.14",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1358,14 +1358,27 @@ do
     
 	local def_vol
 	pcall(function()
+		def_vol = readfile("hatch.txt")
+	end)
+	if def_vol == "false" then
+		def_vol = false
+	else
+		def_vol = true
+	end
+	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Eggs", Default = def_vol})
+    Toggle:OnChanged(function()
+		pcall(function()
+			writefile("hatch.txt", tostring(Options.hatch_egg.Value))
+		end)
+	end)
+	
+	local def_vol
+	pcall(function()
 		def_vol = readfile("egg.txt")
 	end)
 	if not def_vol then
 		def_vol = 1
 	end
-	local Toggle = Tabs.Main:AddToggle("hatch_egg", {Title = "Hatch Eggs", Default = true})
-    Toggle:OnChanged(function()
-	end)
 	local Dropdown = Tabs.Main:AddDropdown("eggs", {
 		Title = "egg to hatch:",
 		Values = eggs,
@@ -3090,7 +3103,7 @@ function()
 									
 									if #legends < 18 and Options.give_items.Value then
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.gifts do
-											if not v.id:find("furniture") and not v.id:find("funiture") then
+											if not v.id:find("furniture") and not v.id:find("funiture") and not v.id:find("winter_2025") then
 												table.insert(legends, v.unique)
 												--con_log(v.id)
 											end
@@ -3623,7 +3636,9 @@ Options.Farm:SetValue(true)
 wait(1)
 --Options.Event1:SetValue(true)
 --Options.Event2:SetValue(true)
-Options.Trans:SetValue(true)
+if Options.m_serv.Value:find(":") then
+	Options.Trans:SetValue(true)
+end
 
 
 --]]
