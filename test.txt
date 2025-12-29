@@ -1106,48 +1106,66 @@ local function mystery(n)
 		end)--if err then con_log(err, "ERROR open")end
 		--if true then return end-----
 		local chk
-		for n2=2,4 do
-			if table.find(event_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text]) and event_on then
-				break
+		local _,err=pcall(function()
+			for n2=2,4 do
+				if table.find(event_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text]) and event_on then
+					break
+				end
+				if Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.Frame.Bonus.Visible then
+					con_log(cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text],"BONUS:")
+					--ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(v3[3], n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
+					ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(PetID, 'mystery', n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
+					wait(1)
+					chk = true
+					break
+				end
 			end
-			if Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.Frame.Bonus.Visible then
-				con_log(cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text],"BONUS:")
-				--ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(v3[3], n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
-				ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(PetID, 'mystery', n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
-				wait(1)
-				chk = true
-				break
+		end)
+		if err then
+			if v3[1]==4 then--and #elems > 4 then
+				con_log("", "UEBON")------
+				getconnections(Player.PlayerGui.FocusPetApp.Frame.Backpack.OpenBackpackContainer.OpenBackpack.MouseButton1Click)[1].Function()
+				getconnections(Player.PlayerGui.FocusPetApp.Frame.Backpack.OpenBackpackContainer.OpenBackpack.MouseButton1Click)[1].Function()
+				wait()
+				getconnections(elems[5].End.MouseButton1Click)[1].Function()
+				wait(.5)
+				local _,err=pcall(function()
+					getconnections(Player.PlayerGui.FocusPetApp.Frame.Tooltip.AilmentCard.MouseButton1Click)[1].Function()
+					wait(1)
+				end)
 			end
 		end
 		if not chk then
-			if table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[2].Container.Content.Text.AilmentName.Text]) and
-			table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[3].Container.Content.Text.AilmentName.Text]) and
-			table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[4].Container.Content.Text.AilmentName.Text]) then
-				street = v3[3]
-			end
-			--if table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[2].Container.Content.Text.AilmentName.Text]) or
-			--table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[3].Container.Content.Text.AilmentName.Text]) or
-			--table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[4].Container.Content.Text.AilmentName.Text]) then
-				--con_log(i, "passed:")
-				--wait(.5)
-			--else
-				for n2=2,4 do
-					if not table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text]) then
-						if table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[2].Container.Content.Text.AilmentName.Text]) or
-						table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[3].Container.Content.Text.AilmentName.Text]) or
-						table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[4].Container.Content.Text.AilmentName.Text]) then
-							red = true
-						end
-						if not red or (red and table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])) then
-							con_log(cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text].." = "..tostring(n2-1),"OPEN: "..v3[3])
-							--ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(v3[3], n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
-							ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(PetID, 'mystery', n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
-							wait(1)
-							break
+			pcall(function()
+				if table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[2].Container.Content.Text.AilmentName.Text]) and
+				table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[3].Container.Content.Text.AilmentName.Text]) and
+				table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[4].Container.Content.Text.AilmentName.Text]) then
+					street = v3[3]
+				end
+				--if table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[2].Container.Content.Text.AilmentName.Text]) or
+				--table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[3].Container.Content.Text.AilmentName.Text]) or
+				--table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[4].Container.Content.Text.AilmentName.Text]) then
+					--con_log(i, "passed:")
+					--wait(.5)
+				--else
+					for n2=2,4 do
+						if not table.find(street_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text]) then
+							if table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[2].Container.Content.Text.AilmentName.Text]) or
+							table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[3].Container.Content.Text.AilmentName.Text]) or
+							table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[4].Container.Content.Text.AilmentName.Text]) then
+								red = true
+							end
+							if not red or (red and table.find(red_task, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])) then
+								con_log(cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text].." = "..tostring(n2-1),"OPEN: "..v3[3])
+								--ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(v3[3], n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
+								ReplicatedStorage.API["AilmentsAPI/ChooseMysteryAilment"]:FireServer(PetID, 'mystery', n2-1, cards[Player.PlayerGui.FocusPetApp.ChooseAilment.Choices:GetChildren()[n2].Container.Content.Text.AilmentName.Text])
+								wait(1)
+								break
+							end
 						end
 					end
-				end
-			--end
+				--end
+			end)
 		end
 		--getconnections(Player.PlayerGui.FocusPetApp.Frame.Backpack.OpenBackpackContainer.OpenBackpack.MouseButton1Click)[1]:Fire()
 		--getconnections(Player.PlayerGui.FocusPetApp.Frame.Backpack.OpenBackpackContainer.OpenBackpack.MouseButton1Click)[1]:Fire()
@@ -1277,7 +1295,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.14",
+    SubTitle = "ver. 2.8.15",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
