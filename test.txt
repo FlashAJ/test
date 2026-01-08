@@ -63,10 +63,12 @@ local legendary_pets = {
 
 
 local bowls_f = {
-	"PetFoodBbowl",
+	"pet_food_bowl",
+	--"PetFoodBbowl",
 }
 local bowls_w = {
-	"PetWaterBowl",
+	"",
+	--"PetWaterBowl",
 }
 local Washings = {
     "StylishShower",
@@ -146,8 +148,10 @@ local eating = {
 	"icecream",				--1$
 }
 local cashbox = {
-    "CashRegister",
-    "GoldenCashRegister",
+    "cashregister",
+    "golden_cash_register",
+    --"CashRegister",
+    --"GoldenCashRegister",
 }
 
 local Tasks = {		--this for information!
@@ -486,8 +490,16 @@ local function SetLocation(A, B, C)
 		set_thread_identity(2)
 		O = get_thread_identity()
 	end
-	Location(A, B, C)
-	wait(2)
+	local t = os.time()
+	local res
+	spawn(function()
+		res,_=pcall(function()
+			Location(A, B, C)
+		end)
+	end)
+	while not res and os.time()-t < 5 do
+		wait(1)
+	end
 	if Synaps then
 		syn.set_thread_identity(O)
 	elseif ScWare then
@@ -573,7 +585,8 @@ end
 
 
 function Furniture(Name)
-    for i, v in pairs(Workspace.HouseInteriors.furniture:GetChildren()) do
+    --[=[
+	for i, v in pairs(Workspace.HouseInteriors.furniture:GetChildren()) do
         if v:FindFirstChildWhichIsA("Model") and (table.find(Name, v:FindFirstChildWhichIsA("Model").Name)) then
 			local v2 = v.Name
 			local b = v2
@@ -585,6 +598,18 @@ function Furniture(Name)
 			return b
         end
     end
+	--]=]
+	for _,n in Name do
+		for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
+			local tmp = v.id
+			if tmp:find("_tutorial") then
+				tmp = tmp:gsub("_tutorial", "")
+			end
+			if tmp == n:lower() then
+				return i
+			end
+		end
+	end
 end
 
 
@@ -1295,7 +1320,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.15",
+    SubTitle = "ver. 2.8.16",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1328,6 +1353,7 @@ do
     local Toggle = Tabs.Main:AddToggle("Farm", {Title = "Farm", Default = false})
     Toggle:OnChanged(function()
 		if Options.Farm.Value and exper then
+			local _,err=pcall(function()
 			con_log("", "Farm started")
 			--spawn(function()
 			ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
@@ -1340,6 +1366,7 @@ do
 				end
 				if n > 20 then
 					con_log("maybe something is broken", "ERROR!")
+					SetLocation("housing", "MainDoor", {["house_owner"] = Player})
 					break
 				end
 			end
@@ -1361,6 +1388,7 @@ do
 			Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
 			Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 			--end)
+			end)if err then con_log(err, "ERROR FARM:")end
 		elseif farm then
 			con_log("", "Farm stopped")
 			farm = false
@@ -2614,9 +2642,15 @@ function()
 					local tmpID = string.split(GetCurrentPetOut().unique_id, "-")
 					tmpID = table.concat(tmpID, "-", 1, #tmpID-1)
 					if PetID ~= tmpID then
-						ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
-						ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(tmpID)
-						PetID = tmpID
+						--if not table.find(worked_pets, require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[tmpID].id) then
+						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets[tmpID].id == "aztec_egg_2025_aztec_egg" then
+							ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(tmpID)
+							ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(PetID)
+						else
+							ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+							ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(tmpID)
+							PetID = tmpID
+						end
 					end
 				else
 					Pets()
@@ -2972,7 +3006,7 @@ function()
 								end
 								
 								local _,err=pcall(function()
-									local res = game:HttpGet("http://"..visor.."/"..Player.Name.."?"..table.concat(req, "&"))
+									game:HttpGet("http://"..visor.."/"..Player.Name.."?"..table.concat(req, "&"))
 									if VIP then
 										local res = game:HttpGet("http://"..visor.."/VIP?"..Player.Name)
 										if Players:FindFirstChild(res) then
@@ -3101,13 +3135,16 @@ function()
 							if Players:FindFirstChild(t_user) then
 								if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[t_user].char_wrapper_raw.location end) then
 									local legends = {}
+									local legend_pets
 									for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
 										if v.id == "practice_dog" or v.id:find("minigame") or v.properties.friendship_level > 10 then
 										elseif endswith(v.id, "_egg") and not table.find(eggs, v.id) then
 											table.insert(legends, v.unique)
+											legend_pets = true
 										elseif v.properties.mega_neon then
 											if table.find(legendary_pets, v.id) then
 												table.insert(legends, v.unique)
+												legend_pets = true
 											elseif Player.Name == "Trulala09348" and v.id == "winter_2023_beluga_whale" then
 											else
 												ReplicatedStorage.API["TradeAPI/GiveItem"]:InvokeServer(Players[t_user], v.unique)
@@ -3115,6 +3152,7 @@ function()
 										elseif v.properties.age == 6 and v.properties.neon then
 											if table.find(legendary_pets, v.id) then
 												table.insert(legends, v.unique)
+												legend_pets = true
 											end
 										end
 									end
@@ -3155,7 +3193,7 @@ function()
 											end
 										end
 										for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pet_accessories do
-											if not table.find({"white_bowtie", "cowbell", "blue_cap"}, v.id) then
+											if not table.find({"white_bowtie", "cowbell", "blue_cap"}, v.id) and not v.id:find("tutorial") then
 												table.insert(legends, v.unique)
 												--con_log(v.id)
 											end
@@ -3175,19 +3213,46 @@ function()
 									
 									if #legends > 0 then
 										if not Player.PlayerGui.TradeApp.Frame.Visible then
-											ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
-											wait(3)
+											local notex
 											local n = 0
+											if #legends > 4 or legend_pets then
+												ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
+												notex = true
+											elseif visor ~= "" and visor:find(":") then
+												local res = ""
+												local _,err=pcall(function()
+													res = game:HttpGet("http://"..visor.."/unicorn")
+												end)
+												if err then
+													con_log(err, "VISOR error:")
+												end
+												if res ~= "" then
+													local _,err=pcall(function()
+														if res == Player.Name then
+														elseif Players:FindFirstChild(res) then
+															if pcall(function() local tmp = require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[res].char_wrapper_raw.location end) then
+																ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[res])
+																notex = true
+																--n = n - 20
+															end
+														end
+													end)if err then con_log(err) end
+												end
+											end
+											if not notex then
+												return
+											end
+											wait(3)
 											while not Player.PlayerGui.TradeApp.Frame.Visible do
 												con_log("wait for tradeApp...")
-												wait(2)
-												n = n + 2
-												if n > 10 then
+												wait(1)
+												n = n + 1
+												if n > 20 then
 													break
 												end
 											end
 											local n_item
-											if n <= 10 then
+											if n <= 20 then
 												for i,v in legends do
 													ReplicatedStorage.API["TradeAPI/AddItemToOffer"]:FireServer(v)
 													n_item = i
@@ -3239,67 +3304,77 @@ function()
 				-- get food
 				---[==[
 				local f_num, w_num = 0, 0
-				for _,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
-					if v.id == "pizza_shop_cheese" then
-						f_num = f_num + 1
+				local _,err=pcall(function()
+					for _,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
+						if v.id == "pizza_shop_cheese" then
+							f_num = f_num + 1
+						end
+						if v.id == "soda_fountain_water" or v.id == "soda_fountain_soda" then
+							w_num = w_num + 1
+						end
 					end
-					if v.id == "soda_fountain_water" or v.id == "soda_fountain_soda" then
-						w_num = w_num + 1
-					end
-				end
-				if f_num < 5 or w_num < 2 then
-					if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id ~= "PizzaShop" then
-						GoToStore("PizzaShop")
-						--Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
-					end
-					if f_num < 5 then
-						local fur = "f-12"
-						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
-							if v.id == "pizza_shop_ingredients_crates" then
-								fur = i
-								break
+					if f_num < 5 or w_num < 2 then
+						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.destination_id ~= "PizzaShop" then
+							GoToStore("PizzaShop")
+							--Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+						end
+						if f_num < 5 then
+							local fur = "f-12"
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
+								if v.id == "pizza_shop_ingredients_crates" then
+									fur = i
+									break
+								end
+							end
+							for i=1,30 do
+								ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(fur, "Cheese", {}, Player.Character)
 							end
 						end
-						for i=1,30 do
-							ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(fur, "Cheese", {}, Player.Character)
-						end
-					end
-					if w_num < 2 then
-						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
-							if v.id == "pizza_shop_coaster" and not v.drink then
-								ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer("f-54", "Water", {}, Player.Character)
-								wait(.05)
-								ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(i, "UseBlock", {}, Player.Character)
-								wait(.05)
+						if w_num < 2 then
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
+								if v.id == "pizza_shop_coaster" and not v.drink then
+									ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer("f-54", "Water", {}, Player.Character)
+									wait(.05)
+									ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(i, "UseBlock", {}, Player.Character)
+									wait(.05)
+								end
 							end
-						end
-						ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer("f-54", "Water", {}, Player.Character)
-						wait(.5)
-						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
-							if v.id == "pizza_shop_coaster" and v.drink then
-								ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(i, "UseBlock", {}, Player.Character)
-								wait()
+							ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer("f-54", "Water", {}, Player.Character)
+							wait(.5)
+							for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].house_interior.furniture do
+								if v.id == "pizza_shop_coaster" and v.drink then
+									ReplicatedStorage.API["HousingAPI/ActivateInteriorFurniture"]:InvokeServer(i, "UseBlock", {}, Player.Character)
+									wait()
+								end
 							end
 						end
 					end
+				end)
+				if err then
+					--con_log(err, "error food:")
 				end
 				--]==]
 				---------------------------------
 				-- red tasks --
-				for _,v in red_task do
-					if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[v] then
-						if not event_flag then
-							red_work(v)
-						end
-						break
-					elseif require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
-						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v] then
+				local _,err=pcall(function()
+					for _,v in red_task do
+						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.baby_ailments[v] then
 							if not event_flag then
 								red_work(v)
 							end
 							break
+						elseif require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID] then
+							if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].ailments_manager.ailments[PetID][v] then
+								if not event_flag then
+									red_work(v)
+								end
+								break
+							end
 						end
 					end
+				end)
+				if err then
+					--con_log(err, "error red task:")
 				end
 				---------------------------------
 				-- blue task
