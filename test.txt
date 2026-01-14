@@ -497,7 +497,7 @@ local function SetLocation(A, B, C)
 			Location(A, B, C)
 		end)
 	end)
-	while not res and os.time()-t < 5 do
+	while not res and os.time()-t < 20 do
 		wait(1)
 	end
 	if Synaps then
@@ -1320,7 +1320,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.16",
+    SubTitle = "ver. 2.8.17",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1859,6 +1859,39 @@ do
 									end)if err then con_log(err) end
 								end
 							end
+						end
+						
+						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner then
+							if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(Player.Name) then
+								local chk = true
+								for i,v in m_bankers or {} do
+									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(v) then
+										chk = false
+									end
+								end
+								if chk then
+									if not busy then
+										busy = true
+										local _,err=pcall(function()
+											GoToHome()
+										end)
+										busy = false
+									end
+								end
+							end
+							--[==[
+							if Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model").Name ~= Player.Name then
+								if not table.find(m_bankers, Workspace.HouseInteriors.blueprint:FindFirstChildWhichIsA("Model").Name) then
+									if not busy then
+										busy = true
+										local _,err=pcall(function()
+											GoToHome()
+										end)
+										busy = false
+									end
+								end
+							end
+							--]==]
 						end
 					
 					end)
@@ -2884,11 +2917,11 @@ function()
 						end
 					end)if err then con_log(err) end
 					local _,err=pcall(function()
-						if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible or Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
+						if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then--or Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
 							local dialog = "NormalDialog"
-							if Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
-								dialog = "HeaderDialog"
-							end
+							--if Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
+								--dialog = "HeaderDialog"
+							--end
 							for i,v in Players:GetPlayers() do
 								if v ~= Player and Player.PlayerGui.DialogApp.Dialog[dialog].Info.TextLabel.Text:find(v.Name) then
 									con_log(v.Name, "found request:")
@@ -3215,7 +3248,7 @@ function()
 										if not Player.PlayerGui.TradeApp.Frame.Visible then
 											local notex
 											local n = 0
-											if #legends > 4 or legend_pets then
+											if #legends >= 18 or legend_pets then
 												ReplicatedStorage.API["TradeAPI/SendTradeRequest"]:FireServer(Players[t_user])
 												notex = true
 											elseif visor ~= "" and visor:find(":") then
