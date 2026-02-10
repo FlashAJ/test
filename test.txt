@@ -1320,7 +1320,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.17",
+    SubTitle = "ver. 2.8.18",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1358,6 +1358,7 @@ do
 			--spawn(function()
 			ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
 			--ReplicatedStorage.API["FamilyAPI/CreateFamily"]:InvokeServer()
+			--wait(4)
 			local n = 0
 			while wait(1) do
 				n = n + 1
@@ -1378,6 +1379,8 @@ do
 			con_log(err)
 			end
 			
+			Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+			Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 			bed = Furniture(Beds)
 			wash = Furniture(Washings)
 			toil = Furniture({"Toilet"})
@@ -1385,8 +1388,17 @@ do
 			w_bowl = Furniture(bowls_w)
 			wait(2)
 			farm = true
-			Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
-			Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+			local chk_start = os.time()
+			--while pcall(function() return Player.Character.HumanoidRootPart.CFrame.X ~= Workspace.Pstone.CFrame.X end) and os.time()-chk_start < 30 do
+			while Player.Character.HumanoidRootPart.CFrame.X ~= Workspace.Pstone.CFrame.X and os.time()-chk_start < 30 do
+				wait(.5)
+			end
+			if os.time()-chk_start > .5 then
+				Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+				Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+				--Player.Character.HumanoidRootPart.CFrame = Workspace.Pstone.CFrame * CFrame.new(Vector3.new(0,3,0))
+			end
+			
 			--end)
 			end)if err then con_log(err, "ERROR FARM:")end
 		elseif farm then
@@ -2439,12 +2451,24 @@ function()
 					end
 				end
 				--if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.Face.TextLabel.Text == 'Okay' then
-				if #Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren() < 3 then
+				if #Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons:GetChildren() < 3 or Player.PlayerGui.DialogApp.Dialog.NormalDialog.Info.TextLabel.Text:find("teleport") then
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Down)[1].Function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Up)[1].Function()
 					getconnections(Player.PlayerGui.DialogApp.Dialog.NormalDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
 				end
 			end
+			
+			if Player.PlayerGui.DialogApp.Dialog.DropdownDialog.Visible then
+				getconnections(Player.PlayerGui.DialogApp.Dialog.DropdownDialog.Buttons.ButtonTemplate.MouseButton1Down)[1].Function()
+				getconnections(Player.PlayerGui.DialogApp.Dialog.DropdownDialog.Buttons.ButtonTemplate.MouseButton1Up)[1].Function()
+				getconnections(Player.PlayerGui.DialogApp.Dialog.DropdownDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+			end
+			if Player.PlayerGui.DialogApp.Dialog.ScrollingDialog.Visible then
+				getconnections(Player.PlayerGui.DialogApp.Dialog.ScrollingDialog.Buttons.ButtonTemplate.MouseButton1Down)[1].Function()
+				getconnections(Player.PlayerGui.DialogApp.Dialog.ScrollingDialog.Buttons.ButtonTemplate.MouseButton1Up)[1].Function()
+				getconnections(Player.PlayerGui.DialogApp.Dialog.ScrollingDialog.Buttons.ButtonTemplate.MouseButton1Click)[1].Function()
+			end
+			
 			if Player.PlayerGui.MinigameRewardsApp.Body.Visible then
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Down)[1].Function()
 				getconnections(Player.PlayerGui.MinigameRewardsApp.Body.Button.MouseButton1Down)[1]:Fire()
@@ -2734,7 +2758,7 @@ function()
 						local _,err=pcall(function()
 							con_log("babyfarm")----
 							ReplicatedStorage.API["TeamAPI/ChooseTeam"]:InvokeServer("Babies", {},true)
-							wait(2)
+							wait(4)
 							local n = 0
 							while n < 20 do
 								wait(1)
