@@ -427,7 +427,7 @@ if err and exper then
 	loc.Parent = Player.PlayerGui
 	local loc2 = Instance.new("Frame")
 	loc2.Name = "Container"
-	loc2.Position = UDim2.new(0, 250, 0, -15)
+	loc2.Position = UDim2.new(0, 300, 0, -15)
 	loc2.Parent = Player.PlayerGui.indicator
 	local loc2 = Instance.new("TextLabel")
 	loc2.Name = "Amount"
@@ -1320,7 +1320,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.18",
+    SubTitle = "ver. 2.8.19",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -1379,8 +1379,6 @@ do
 			con_log(err)
 			end
 			
-			Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
-			Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 			bed = Furniture(Beds)
 			wash = Furniture(Washings)
 			toil = Furniture({"Toilet"})
@@ -1388,16 +1386,21 @@ do
 			w_bowl = Furniture(bowls_w)
 			wait(2)
 			farm = true
+			
+			Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+			Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
 			local chk_start = os.time()
 			--while pcall(function() return Player.Character.HumanoidRootPart.CFrame.X ~= Workspace.Pstone.CFrame.X end) and os.time()-chk_start < 30 do
-			while Player.Character.HumanoidRootPart.CFrame.X ~= Workspace.Pstone.CFrame.X and os.time()-chk_start < 30 do
-				wait(.5)
-			end
-			if os.time()-chk_start > .5 then
-				Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
-				Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
-				--Player.Character.HumanoidRootPart.CFrame = Workspace.Pstone.CFrame * CFrame.new(Vector3.new(0,3,0))
-			end
+			spawn(function()
+				while os.time()-chk_start < 120 do
+					wait(.3)
+					if Player.Character.HumanoidRootPart.CFrame.Y - Workspace.Pstone.CFrame.Y > 10 or Workspace.Pstone.CFrame.Y > Player.Character.HumanoidRootPart.CFrame.Y then
+						Player.Character.HumanoidRootPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,100,0))
+						Workspace.Pstone.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(Vector3.new(0,-3,0))
+						--Player.Character.HumanoidRootPart.CFrame = Workspace.Pstone.CFrame * CFrame.new(Vector3.new(0,3,0))
+					end
+				end
+			end)
 			
 			--end)
 			end)if err then con_log(err, "ERROR FARM:")end
@@ -1513,7 +1516,7 @@ do
 				end
 			end)
 		end
-    })		
+    })
 	
 	local Toggle = Tabs.Main:AddToggle("with_bottle", {Title = "Use Age-Up Potions", Default = false})
     Toggle:OnChanged(function()
@@ -2973,6 +2976,7 @@ function()
 									local t = os.time()
 									while not Player.PlayerGui.TradeApp.Frame.ConfirmationFrame.Visible and os.time()-t < 20 do
 										wait(.3)
+										ReplicatedStorage.API["TradeAPI/AcceptNegotiation"]:FireServer()
 									end
 									wait(1)
 									ReplicatedStorage.API["TradeAPI/ConfirmTrade"]:FireServer()
