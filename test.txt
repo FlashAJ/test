@@ -1880,7 +1880,7 @@ do
 							if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(Player.Name) then
 								local chk = true
 								for i,v in m_bankers or {} do
-									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(v) then
+									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(v or "") then
 										chk = false
 									end
 								end
