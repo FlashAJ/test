@@ -1320,7 +1320,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.19",
+    SubTitle = "ver. 2.8.20",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2943,6 +2943,66 @@ function()
 							end
 						end
 					end)if err then con_log(err) end
+					
+					local _,err=pcall(function()
+						if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].idle_progression_manager.age_up_pending then
+							ReplicatedStorage.API["IdleProgressionAPI/CommitAllProgression"]:FireServer()
+						end
+						local n = 4
+						local current_pp = {}
+						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].idle_progression_manager.active_pets do
+							n = n - 1
+							if v.max_age or v.disabled then
+								ReplicatedStorage.API["IdleProgressionAPI/RemovePet"]:FireServer(i)
+								n = n + 1
+							else
+								table.insert(current_pp, i)
+							end
+						end
+						--con_log(n, "PIGGER:")
+						local dub_n = n
+						for i=1,dub_n do
+							for uniq,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
+								if v.properties.age < 6 and uniq ~= PetID and not table.find(current_pp, uniq) then
+									if v.id == "practice_dog" or v.id:find("minigame") then
+									elseif endswith(v.id, "_egg") then
+										if v.id == Options.eggs.Value then
+											ReplicatedStorage.API["IdleProgressionAPI/AddPet"]:FireServer(uniq)
+											n = n - 1
+										end
+									else
+										ReplicatedStorage.API["IdleProgressionAPI/AddPet"]:FireServer(uniq)
+										n = n - 1
+									end
+								end
+							end
+						end
+						for i=1,n do
+							if Options.eggs.Value == "retired_egg" and not VIP then
+								local res = ""
+								local _,err=pcall(function()
+									res = game:HttpGet("http://"..visor.."/old_egg?"..Player.Name)
+								end)
+								if res ~= "" then
+									if not send_for_egg[res] then
+										send_for_egg[res] = {os.time()-120, 600}
+									else
+										send_for_egg[res][2] = send_for_egg[res][2] + 600
+									end
+								end
+							else
+								if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].money >= egg_price[Options.eggs.Value] then
+									local buy = ReplicatedStorage.API["ShopAPI/BuyItem"]:InvokeServer("pets", Options.eggs.Value, {})
+									if buy == "success" then
+										--wait(1)
+									else
+										con_log(buy, "wrong buy egg:")
+									end
+								end
+							end
+						end
+					end)if err then con_log(err, "ERROR pigger:") end
+					
 					local _,err=pcall(function()
 						if Player.PlayerGui.DialogApp.Dialog.NormalDialog.Visible then--or Player.PlayerGui.DialogApp.Dialog.HeaderDialog.Visible then
 							local dialog = "NormalDialog"
