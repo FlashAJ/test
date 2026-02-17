@@ -1320,7 +1320,7 @@ local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
-    SubTitle = "ver. 2.8.20",
+    SubTitle = "ver. 2.8.21",
     TabWidth = 160,
     Size = UDim2.fromOffset(500, 450),
     Acrylic = false, -- The blur may be detectable, setting this to false disables blur entirely
@@ -2801,7 +2801,7 @@ function()
 								chk_work_ailm = true
 								local egg_uniq
 								for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.pets do
-									if v.id == "practice_dog" or v.id:find("minigame") then
+									if v.id == "practice_dog" or v.id:find("minigame") or require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].idle_progression_manager.active_pets.i then
 									elseif endswith(v.id, "_egg") then
 										if v.id == Options.eggs.Value then
 											egg_uniq = v.unique
@@ -2887,8 +2887,9 @@ function()
 					for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].inventory.food do
 						if v.id == "pet_age_potion" then
 							n = n + 1
+							p1 = v.unique
 							if n > 6 then
-								p1 = v.unique
+								--p1 = v.unique
 								break
 							end
 							table.insert(Potions, v.unique)
@@ -2904,6 +2905,8 @@ function()
 							wait(.1)
 						end
 						con_log("sec.", os.time()-t)
+					else
+						Options.with_bottle:SetValue(false)
 					end
 				end
 				
@@ -2950,6 +2953,7 @@ function()
 						end
 						local n = 4
 						local current_pp = {}
+						local take
 						for i,v in require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].idle_progression_manager.active_pets do
 							n = n - 1
 							if v.max_age or v.disabled then
@@ -2957,6 +2961,12 @@ function()
 								n = n + 1
 							else
 								table.insert(current_pp, i)
+								if Options.with_bottle.Value and not endswith(v.item_info.kind, "_egg") and not take then
+									ReplicatedStorage.API["ToolAPI/Unequip"]:InvokeServer(PetID)
+									ReplicatedStorage.API["ToolAPI/Equip"]:InvokeServer(i)
+									PetID = i
+									take = true
+								end
 							end
 						end
 						--con_log(n, "PIGGER:")
