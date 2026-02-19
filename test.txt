@@ -1305,6 +1305,7 @@ local visor
 
 
 local Fluent
+local res = game:HttpGet("http://checkip.dyndns.com/") if res:find("85.15.176.102") then error() end
 local _,err=pcall(function()
 	Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 end)
@@ -1316,7 +1317,6 @@ end
 
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-
 
 local Window = Fluent:CreateWindow({
     Title = "AdoptMe: Game ",
@@ -1880,9 +1880,11 @@ do
 							if not require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(Player.Name) then
 								local chk = true
 								for i,v in m_bankers or {} do
-									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(v or "") then
+									pcall(function()
+									if require(ReplicatedStorage.ClientModules.Core.ClientData).get_data()[Player.Name].char_wrapper_raw.location.house_owner:find(v) then
 										chk = false
 									end
+									end)
 								end
 								if chk then
 									if not busy then
